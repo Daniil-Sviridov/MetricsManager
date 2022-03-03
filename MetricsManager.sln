@@ -3,21 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsManager", "MetricsManager\MetricsManager.csproj", "{69F66AD5-2299-4E8A-B7CF-E060AD1B43EA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetricsManager", "MetricsManager\MetricsManager.csproj", "{69F66AD5-2299-4E8A-B7CF-E060AD1B43EA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CpuMetricsControllerUnitTests", "CpuMetricsControllerUnitTests\CpuMetricsControllerUnitTests.csproj", "{6EE8DD43-70EE-478C-90D1-0EA92A14758C}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DotNetMetricsControllerUnitTest", "DotNetMetricsControllerUnitTest\DotNetMetricsControllerUnitTest.csproj", "{30D5B497-7358-4BE1-8C3E-3879BE28FE3D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HddMetricsControllerUnitTest", "HddMetricsControllerUnitTest\HddMetricsControllerUnitTest.csproj", "{84D7D0FC-E9D8-4335-930D-9C70D4727F66}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetworkMetricsControllerUnitTest", "NetworkMetricsControllerUnitTest\NetworkMetricsControllerUnitTest.csproj", "{A6B5FF42-7813-46EB-93E6-59D7C6B14F2F}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RamMetricsControllerUnitTest", "RamMetricsControllerUnitTest\RamMetricsControllerUnitTest.csproj", "{298FD904-8E5C-4780-8F97-F8BDA999C4FA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetricsManagerTests", "CpuMetricsControllerUnitTests\MetricsManagerTests.csproj", "{6EE8DD43-70EE-478C-90D1-0EA92A14758C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UnitTests", "UnitTests", "{A99C3697-0023-44BD-942E-007C75818E00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsAgent", "MetricsAgent\MetricsAgent.csproj", "{3F60C9EC-8EF8-4CA2-82E8-BD558937086A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MetricsAgent", "MetricsAgent\MetricsAgent.csproj", "{3F60C9EC-8EF8-4CA2-82E8-BD558937086A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MetricsAgentTests", "MetricsAgentTests\MetricsAgentTests.csproj", "{9186C956-E00C-4734-984E-021F76304F32}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,36 +27,21 @@ Global
 		{6EE8DD43-70EE-478C-90D1-0EA92A14758C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6EE8DD43-70EE-478C-90D1-0EA92A14758C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EE8DD43-70EE-478C-90D1-0EA92A14758C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{30D5B497-7358-4BE1-8C3E-3879BE28FE3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{30D5B497-7358-4BE1-8C3E-3879BE28FE3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{30D5B497-7358-4BE1-8C3E-3879BE28FE3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{30D5B497-7358-4BE1-8C3E-3879BE28FE3D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{84D7D0FC-E9D8-4335-930D-9C70D4727F66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{84D7D0FC-E9D8-4335-930D-9C70D4727F66}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{84D7D0FC-E9D8-4335-930D-9C70D4727F66}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{84D7D0FC-E9D8-4335-930D-9C70D4727F66}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A6B5FF42-7813-46EB-93E6-59D7C6B14F2F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A6B5FF42-7813-46EB-93E6-59D7C6B14F2F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A6B5FF42-7813-46EB-93E6-59D7C6B14F2F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A6B5FF42-7813-46EB-93E6-59D7C6B14F2F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{298FD904-8E5C-4780-8F97-F8BDA999C4FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{298FD904-8E5C-4780-8F97-F8BDA999C4FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{298FD904-8E5C-4780-8F97-F8BDA999C4FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{298FD904-8E5C-4780-8F97-F8BDA999C4FA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{3F60C9EC-8EF8-4CA2-82E8-BD558937086A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{3F60C9EC-8EF8-4CA2-82E8-BD558937086A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3F60C9EC-8EF8-4CA2-82E8-BD558937086A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3F60C9EC-8EF8-4CA2-82E8-BD558937086A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9186C956-E00C-4734-984E-021F76304F32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9186C956-E00C-4734-984E-021F76304F32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9186C956-E00C-4734-984E-021F76304F32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9186C956-E00C-4734-984E-021F76304F32}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{6EE8DD43-70EE-478C-90D1-0EA92A14758C} = {A99C3697-0023-44BD-942E-007C75818E00}
-		{30D5B497-7358-4BE1-8C3E-3879BE28FE3D} = {A99C3697-0023-44BD-942E-007C75818E00}
-		{84D7D0FC-E9D8-4335-930D-9C70D4727F66} = {A99C3697-0023-44BD-942E-007C75818E00}
-		{A6B5FF42-7813-46EB-93E6-59D7C6B14F2F} = {A99C3697-0023-44BD-942E-007C75818E00}
-		{298FD904-8E5C-4780-8F97-F8BDA999C4FA} = {A99C3697-0023-44BD-942E-007C75818E00}
+		{9186C956-E00C-4734-984E-021F76304F32} = {A99C3697-0023-44BD-942E-007C75818E00}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DA7414D3-AC17-45A1-ABFA-E86D696AEFA0}
