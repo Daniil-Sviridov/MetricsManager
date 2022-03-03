@@ -11,7 +11,7 @@ namespace MetricsManagerTests
 
         public CpuControllerUnitTest()
         {
-            controller = new CpuMetricsController();
+            controller = new CpuMetricsController(ILogger <CpuMetricsController> logger);
         }
 
         [Fact]

@@ -1,25 +1,96 @@
-var builder = WebApplication.CreateBuilder(args);
+using NLog.Web;
+
+var builder = WebApplication.CreateBuilder();
+
+var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
 
 // Add services to the container.
-
 builder.Services.AddControllers();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+try
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    logger.Debug("init main");
+
+    var app = builder.Build();
+
+    builder.Services.AddSingleton<ILogger>();
+
+    // Configure the HTTP request pipeline.
+    if (app.Environment.IsDevelopment())
+    {
+        app.UseSwagger();
+        app.UseSwaggerUI();
+    }
+
+    app.UseHttpsRedirection();
+
+    app.UseAuthorization();
+
+    app.UseEndpoints(endpoints => endpoints.MapControllers());
+
+    app.Run();
+}
+catch (Exception ex)
+{
+    //NLog: устанавливаем отлов исключений
+    logger.Error(ex, "Stopped program because of exception");
+    throw;
+}
+finally
+{
+    // Остановка логгера 
+    NLog.LogManager.Shutdown();
 }
 
-app.UseHttpsRedirection();
+/*
+using NLog.Web;
 
-app.UseAuthorization();
+namespace MetricsManager
+{
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
+            try
+            {
+                logger.Debug("init main");
+                CreateHostBuilder(args).Build().Run();
+            }
+            // Отлов всех исключений в рамках работы приложения
+            catch (Exception exception)
+            {
+                //NLog: устанавливаем отлов исключений
+                logger.Error(exception, "Stopped program because of exception");
+                throw;
+            }
+            finally
+            {
+                // Остановка логгера 
+                NLog.LogManager.Shutdown();
+            }
+        }
 
-app.MapControllers();
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args).ConfigureWebHostDefaults(webBuilder =>
+            {
+                _ = webBuilder.UseStartup<Startup>();
+            })
+            .ConfigureLogging(logging =>
+            {
+                logging.ClearProviders(); // Создание провайдеров логирования
+                logging.SetMinimumLevel(LogLevel.Trace); // Устанавливаем минимальный уровень логирования
+            }).UseNLog(); // Добавляем библиотеку nlog
+    }
 
-app.Run();
+    internal class Startup
+    {
+        public Startup()
+        {
+        }
+    }
+}*/
