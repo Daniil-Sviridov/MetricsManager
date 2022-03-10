@@ -11,7 +11,7 @@ namespace MetricsManagerTests
 
         public RamControllerUnitTest()
         {
-            controller = new RamMetricsController();
+            controller = new RamMetricsController((Microsoft.Extensions.Logging.ILogger<RamMetricsController>)NLog.LogManager.CreateNullLogger());
         }
 
         [Fact]

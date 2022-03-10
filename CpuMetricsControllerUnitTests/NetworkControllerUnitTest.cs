@@ -11,7 +11,7 @@ namespace MetricsManagerTests
 
         public NetworkControllerUnitTest()
         {
-            controller = new NetworkMetricsController();
+            controller = new NetworkMetricsController((Microsoft.Extensions.Logging.ILogger<NetworkMetricsController>)NLog.LogManager.CreateNullLogger());
         }
 
         [Fact]

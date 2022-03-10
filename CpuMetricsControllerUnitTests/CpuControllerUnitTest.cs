@@ -7,11 +7,11 @@ namespace MetricsManagerTests
 {
     public class CpuControllerUnitTest
     {
-        //private CpuMetricsController controller;
+        private CpuMetricsController controller;
 
-       /* public CpuControllerUnitTest()
+        public CpuControllerUnitTest()
         {
-            controller = new CpuMetricsController();
+            controller = new CpuMetricsController((Microsoft.Extensions.Logging.ILogger<CpuMetricsController>)NLog.LogManager.CreateNullLogger());
         }
 
         [Fact]
@@ -41,6 +41,6 @@ namespace MetricsManagerTests
 
             // Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
-        }*/
+        }
     }
 }

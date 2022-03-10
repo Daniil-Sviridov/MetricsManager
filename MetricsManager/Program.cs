@@ -1,8 +1,8 @@
 using NLog;
 using NLog.Web;
 
-var logPath = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
-NLog.GlobalDiagnosticsContext.Set("LogDirectory", logPath);
+NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
+
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 
 try

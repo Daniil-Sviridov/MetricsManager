@@ -11,7 +11,7 @@ namespace MetricsManagerTests
 
         public DotNetControllerUnitTest()
         {
-            controller = new DotNetMetricsController();
+            controller = new DotNetMetricsController((Microsoft.Extensions.Logging.ILogger<DotNetMetricsController>)NLog.LogManager.CreateNullLogger());
         }
 
         [Fact]

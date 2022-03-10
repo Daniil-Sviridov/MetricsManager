@@ -16,7 +16,7 @@ namespace MetricsManager.Controllers
         public CpuMetricsController(ILogger<CpuMetricsController> logger)
         {
             _logger = logger;
-            _logger.LogDebug("NLog встроен в CpuMetricsController");
+            _logger.LogInformation("NLog встроен в CpuMetricsController");
         }
 
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]

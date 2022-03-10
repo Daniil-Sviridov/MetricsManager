@@ -11,7 +11,7 @@ namespace MetricsManagerTests
 
         public HddControllerUnitTest()
         {
-            controller = new HddMetricsController();
+            controller = new HddMetricsController((Microsoft.Extensions.Logging.ILogger<HddMetricsController>)NLog.LogManager.CreateNullLogger());
         }
 
         [Fact]

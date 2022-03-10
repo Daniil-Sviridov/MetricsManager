@@ -11,7 +11,7 @@ namespace MetricsManagerTests
 
         public CpuControllerUnitTest()
         {
-            controller = new CpuMetricsController();
+            controller = new CpuMetricsController(new rep());
         }
 
         [Fact]
@@ -27,5 +27,9 @@ namespace MetricsManagerTests
             // Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
         }
+    }
+
+    internal class rep : IRepository
+    { 
     }
 }
