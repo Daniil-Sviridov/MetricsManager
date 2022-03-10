@@ -1,3 +1,4 @@
+using MetricsAgent.DAL;
 using NLog;
 using NLog.Web;
 
@@ -24,6 +25,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 builder.Services.AddSingleton<IRepository, NullRepository>();
+builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
 
 var app = builder.Build();
 

@@ -1,31 +1,39 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MetricsAgent.DAL;
+using MetricsAgent.Models;
+using MetricsAgent.Requests;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SQLite;
 
 namespace MetricsAgent.Controllers
 {
-    public class CpuMetric
-    {
-        public int Id { get; set; }
-
-        public int Value { get; set; }
-
-        public long Time { get; set; }
-    }
+ 
 
     [Route("api/metrics/cpu")]
     [ApiController]
     public class CpuMetricsController : ControllerBase
     {
-        IRepository _repository;
+        private readonly ICpuMetricsRepository _repository;
         private readonly ILogger<CpuMetricsController> _logger;
 
-        public CpuMetricsController(ILogger<CpuMetricsController> logger, IRepository repository)
+        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository)
         {
             _repository = repository;
             _logger = logger;
 
             _logger.LogInformation("NLog встроен в CpuMetricsController");
+        }
+
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] CpuMetricCreateRequest request)
+        {
+            _repository.Create(new CpuMetric
+            {
+                Time = request.Time,
+                Value = request.Value
+            });
+
+            return Ok();
         }
 
         [HttpGet("sql-test")]
@@ -104,7 +112,7 @@ namespace MetricsAgent.Controllers
                             {
                                 Id = reader.GetInt32(0), // Читаем данные, полученные из базы данных
                                 Value = reader.GetInt32(1), // преобразуя к целочисленному типу
-                                Time = reader.GetInt64(2)
+                                Time = TimeSpan.FromSeconds(reader.GetInt32(2))
                             };
                             // Увеличиваем значение счётчика
                             counter++;
