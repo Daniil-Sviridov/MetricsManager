@@ -1,17 +1,25 @@
 using MetricsAgent.Controllers;
+using MetricsAgent.DAL;
 using Microsoft.AspNetCore.Mvc;
+using Moq;
 using System;
 using Xunit;
 
-namespace MetricsManagerTests
+namespace MetricsAgentTests
 {
     public class DotNetControllerUnitTest
     {
-        private DotNetMetricsController controller;
+        private DotNetMetricsController _controller;
+        private Mock<IDotNetMetricsRepository> _mockRepository;
+        private Mock<Microsoft.Extensions.Logging.ILogger<DotNetMetricsController>> _mockLogger;
 
         public DotNetControllerUnitTest()
         {
-            controller = new DotNetMetricsController();
+            _mockRepository = new Mock<IDotNetMetricsRepository>();
+
+            _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<DotNetMetricsController>>();
+
+            _controller = new DotNetMetricsController(_mockLogger.Object, _mockRepository.Object);
         }
 
         [Fact]
@@ -22,7 +30,7 @@ namespace MetricsManagerTests
             var toTime = TimeSpan.FromSeconds(100);
 
             //Act
-            var result = controller.GetMetricsFromAgent(fromTime, toTime);
+            var result = _controller.GetMetricsFromAgent(fromTime, toTime);
 
             // Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);

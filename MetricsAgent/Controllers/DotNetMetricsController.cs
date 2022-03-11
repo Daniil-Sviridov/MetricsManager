@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using MetricsAgent.DAL;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MetricsAgent.Controllers
@@ -7,10 +8,10 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class DotNetMetricsController : ControllerBase
     {
-        private IRepository _repository;
+        private readonly IDotNetMetricsRepository _repository;
         private readonly ILogger<DotNetMetricsController> _logger;
 
-        public DotNetMetricsController(ILogger<DotNetMetricsController> logger, IRepository repository)
+        public DotNetMetricsController(ILogger<DotNetMetricsController> logger, IDotNetMetricsRepository repository)
         {
             _repository = repository;
             _logger = logger;

@@ -1,17 +1,26 @@
 using MetricsAgent.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using MetricsAgent.DAL;
+using Moq;
 using System;
 using Xunit;
 
-namespace MetricsManagerTests
+
+namespace MetricsAgentTests
 {
     public class CpuControllerUnitTest
     {
-        private CpuMetricsController controller;
+        private CpuMetricsController _controller;
+        private Mock<ICpuMetricsRepository> _mockRepository;
+        private Mock<Microsoft.Extensions.Logging.ILogger<CpuMetricsController>> _mockLogger;
 
         public CpuControllerUnitTest()
         {
-            controller = new CpuMetricsController(new rep());
+            _mockRepository = new Mock<ICpuMetricsRepository>();
+
+            _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<CpuMetricsController>>();
+
+            _controller = new CpuMetricsController(_mockLogger.Object, _mockRepository.Object);
         }
 
         [Fact]
@@ -22,7 +31,7 @@ namespace MetricsManagerTests
             var toTime = TimeSpan.FromSeconds(100);
 
             //Act
-            var result = controller.GetMetricsFromAgent(fromTime, toTime);
+            var result = _controller.GetMetricsFromAgent(fromTime, toTime);
 
             // Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
