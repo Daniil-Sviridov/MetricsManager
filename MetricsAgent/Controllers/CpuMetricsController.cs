@@ -57,7 +57,7 @@ namespace MetricsAgent.Controllers
         {
             var metrics = _repository.GetAll();
 
-            var response = new AllCpuMetricsResponse()
+            var response = new AllMetricsResponse<CpuMetricDto>()
             {
                 Metrics = new List<CpuMetricDto>()
             };
