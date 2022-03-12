@@ -1,13 +1,15 @@
 ﻿using MetricsAgent.DAL;
+using MetricsAgent.DTO;
 using MetricsAgent.Models;
 using MetricsAgent.Requests;
+using MetricsAgent.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SQLite;
 
 namespace MetricsAgent.Controllers
 {
- 
+
 
     [Route("api/metrics/cpu")]
     [ApiController]
@@ -36,92 +38,44 @@ namespace MetricsAgent.Controllers
             return Ok();
         }
 
-        [HttpGet("sql-test")]
-        public IActionResult TryToSqlLite()
+        [HttpDelete("delete")]
+        public IActionResult Delete([FromRoute] int id)
         {
-            string cs = "Data Source=:memory:";
-            string stm = "SELECT SQLITE_VERSION()";
-
-
-            using (var con = new SQLiteConnection(cs))
-            {
-                con.Open();
-
-                using var cmd = new SQLiteCommand(stm, con);
-                string version = cmd.ExecuteScalar().ToString();
-
-                return Ok(version);
-            }
+            _repository.Delete(id);
+            return Ok();
         }
 
-        [HttpGet("sql-read-write-test")]
-        public IActionResult TryToInsertAndRead()
+        [HttpPut("put")]
+        public IActionResult Update([FromBody] CpuMetric item)
         {
-            // Создаём строку подключения в виде базы данных в оперативной памяти
-            string connectionString = "Data Source=:memory:";
+            _repository.Update(item);
+            return Ok();
+        }
 
-            // Создаём соединение с базой данных
-            using (var connection = new SQLiteConnection(connectionString))
+        [HttpGet("all")]
+        public IActionResult GetAll()
+        {
+            var metrics = _repository.GetAll();
+
+            var response = new AllCpuMetricsResponse()
             {
-                // Открываем соединение
-                connection.Open();
+                Metrics = new List<CpuMetricDto>()
+            };
 
-                // Создаём объект, через который будут выполняться команды к базе данных
-                using (var command = new SQLiteCommand(connection))
-                {
-                    // Задаём новый текст команды для выполнения
-                    // Удаляем таблицу с метриками, если она есть в базе данных
-                    /*command.CommandText = "DROP TABLE IF EXISTS cpumetrics";
-                    // Отправляем запрос в базу данных
-                    command.ExecuteNonQuery();*/
-
-                    // Создаём таблицу с метриками
-                    command.CommandText = @"CREATE TABLE cpumetrics(id INTEGER PRIMARY KEY,
-                    value INT, time INT)";
-                    command.ExecuteNonQuery();
-
-                    // Создаём запрос на вставку данных
-                    command.CommandText = "INSERT INTO cpumetrics(value, time) VALUES(10,1)";
-                    command.ExecuteNonQuery();
-                    command.CommandText = "INSERT INTO cpumetrics(value, time) VALUES(50,2)";
-                    command.ExecuteNonQuery();
-                    command.CommandText = "INSERT INTO cpumetrics(value, time) VALUES(75,4)";
-                    command.ExecuteNonQuery();
-                    command.CommandText = "INSERT INTO cpumetrics(value, time) VALUES(90,5)";
-                    command.ExecuteNonQuery();
-
-                    // Создаём строку для выборки данных из базы
-                    // LIMIT 3 обозначает, что мы достанем только 3 записи
-                    string readQuery = "SELECT * FROM cpumetrics ";
-
-                    // Создаём массив, в который запишем объекты с данными из базы данных
-                    var returnArray = new CpuMetric[4];
-                    // Изменяем текст команды на наш запрос чтения
-                    command.CommandText = readQuery;
-
-                    // Создаём читалку из базы данных
-                    using (SQLiteDataReader reader = command.ExecuteReader())
-                    {
-                        // Счётчик, чтобы записать объект в правильное место в массиве
-                        var counter = 0;
-                        // Цикл будет выполняться до тех пор, пока есть что читать из базы данных
-                        while (reader.Read())
-                        {
-                            // Создаём объект и записываем его в массив
-                            returnArray[counter] = new CpuMetric
-                            {
-                                Id = reader.GetInt32(0), // Читаем данные, полученные из базы данных
-                                Value = reader.GetInt32(1), // преобразуя к целочисленному типу
-                                Time = TimeSpan.FromSeconds(reader.GetInt32(2))
-                            };
-                            // Увеличиваем значение счётчика
-                            counter++;
-                        }
-                    }
-                    // Оборачиваем массив с данными в объект ответа и возвращаем пользователю 
-                    return Ok(returnArray);
-                }
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(new CpuMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
             }
+
+            return Ok(response);
+        }
+
+        [HttpGet("get")]
+        public IActionResult Get([FromRoute] int id)
+        {
+            var metric = _repository.GetById(id);
+
+            return Ok(metric);
         }
 
 

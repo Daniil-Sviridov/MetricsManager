@@ -4,7 +4,8 @@ using MetricsAgent.DAL;
 using Moq;
 using System;
 using Xunit;
-
+using MetricsAgent.Models;
+using MetricsAgent.Requests;
 
 namespace MetricsAgentTests
 {
@@ -36,9 +37,20 @@ namespace MetricsAgentTests
             // Assert
             _ = Assert.IsAssignableFrom<IActionResult>(result);
         }
-    }
 
-    internal class rep : IRepository
-    { 
+        [Fact]
+        public void Create_ShouldCall_Create_From_Repository()
+        {
+            // Устанавливаем параметр заглушки
+            // В заглушке прописываем, что в репозиторий прилетит CpuMetric-объект
+            _mockRepository.Setup(repository => repository.Create(It.IsAny<CpuMetric>())).Verifiable();
+
+            // Выполняем действие на контроллере
+            var result = _controller.Create(new CpuMetricCreateRequest { Time = TimeSpan.FromSeconds(1), Value = 50 });
+
+            // Проверяем заглушку на то, что пока работал контроллер
+            // Вызвался метод Create репозитория с нужным типом объекта в параметре
+            _mockRepository.Verify(repository => repository.Create(It.IsAny<CpuMetric>()), Times.AtMostOnce());
+        }
     }
 }

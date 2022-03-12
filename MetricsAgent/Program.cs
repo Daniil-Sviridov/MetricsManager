@@ -27,6 +27,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddSingleton<IRepository, NullRepository>();
 builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
 builder.Services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
+builder.Services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
+builder.Services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
+builder.Services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
 
 var app = builder.Build();
 
