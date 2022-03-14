@@ -61,7 +61,7 @@ namespace MetricsAgentTests
             _mockRepository.Setup(repository => repository.Create(It.IsAny<CpuMetric>())).Verifiable();
 
             // Выполняем действие на контроллере
-            var result = _controller.Delete();
+            var result = _controller.Delete(1);
 
             // Проверяем заглушку на то, что пока работал контроллер
             // Вызвался метод Create репозитория с нужным типом объекта в параметре
