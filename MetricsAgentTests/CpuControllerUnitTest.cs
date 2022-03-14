@@ -52,5 +52,20 @@ namespace MetricsAgentTests
             // Вызвался метод Create репозитория с нужным типом объекта в параметре
             _mockRepository.Verify(repository => repository.Create(It.IsAny<CpuMetric>()), Times.AtMostOnce());
         }
+
+        [Fact]
+        public void Delet_From_Repository()
+        {
+            // Устанавливаем параметр заглушки
+            // В заглушке прописываем, что в репозиторий прилетит CpuMetric-объект
+            _mockRepository.Setup(repository => repository.Create(It.IsAny<CpuMetric>())).Verifiable();
+
+            // Выполняем действие на контроллере
+            var result = _controller.Delete();
+
+            // Проверяем заглушку на то, что пока работал контроллер
+            // Вызвался метод Create репозитория с нужным типом объекта в параметре
+            _mockRepository.Verify(repository => repository.Create(It.IsAny<CpuMetric>()), Times.AtMostOnce());
+        }
     }
 }
