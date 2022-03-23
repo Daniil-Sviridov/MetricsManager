@@ -1,4 +1,5 @@
-﻿using MetricsAgent.Models;
+﻿using Dapper;
+using MetricsAgent.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -7,24 +8,48 @@ namespace MetricsAgent.DAL
 {
     // Маркировочный интерфейс
     // используется, чтобы проверять работу репозитория на тесте-заглушке
-    public interface IDotNetMetricsRepository : IRepository<DotNetMetric>
+    public interface INetworkMetricsRepository : IRepository<NetworkMetric>
     {
 
     }
 
-    public class DotNetMetricsRepository : IDotNetMetricsRepository
+    public class NetworkMetricsRepository : INetworkMetricsRepository
     {
         private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+
+        public NetworkMetricsRepository()
+        {
+            const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+            var connection = new SQLiteConnection(ConnectionString);
+            connection.Open();
+
+            using (var command = new SQLiteCommand(connection))
+            {
+                // Задаём новый текст команды для выполнения
+                // Удаляем таблицу с метриками, если она есть в базе данных
+                command.CommandText = "DROP TABLE IF EXISTS networkmetrics";
+                // Отправляем запрос в базу данных
+                command.ExecuteNonQuery();
+
+
+                command.CommandText = @"CREATE TABLE networkmetrics(id INTEGER PRIMARY KEY,
+                    value INT, time INTEGER)";
+                command.ExecuteNonQuery();
+            }
+
+            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+        }
+
         // Инжектируем соединение с базой данных в наш репозиторий через конструктор
 
-        public void Create(DotNetMetric item)
+        public void Create(NetworkMetric item)
         {
             using var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
             // Создаём команду
             using var cmd = new SQLiteCommand(connection);
             // Прописываем в команду SQL-запрос на вставку данных
-            cmd.CommandText = "INSERT INTO DotNetMetric(value, time) VALUES(@value, @time)";
+            cmd.CommandText = "INSERT INTO networkmetrics(value, time) VALUES(@value, @time)";
 
             // Добавляем параметры в запрос из нашего объекта
             cmd.Parameters.AddWithValue("@value", item.Value);
@@ -45,19 +70,19 @@ namespace MetricsAgent.DAL
             connection.Open();
             using var cmd = new SQLiteCommand(connection);
             // Прописываем в команду SQL-запрос на удаление данных
-            cmd.CommandText = "DELETE FROM DotNetMetric WHERE id=@id";
+            cmd.CommandText = "DELETE FROM networkmetrics WHERE id=@id";
 
             cmd.Parameters.AddWithValue("@id", id);
             cmd.Prepare();
             cmd.ExecuteNonQuery();
         }
 
-        public void Update(DotNetMetric item)
+        public void Update(NetworkMetric item)
         {
             using var connection = new SQLiteConnection(ConnectionString);
             using var cmd = new SQLiteCommand(connection);
             // Прописываем в команду SQL-запрос на обновление данных
-            cmd.CommandText = "UPDATE DotNetMetric SET value = @value, time = @time WHERE id=@id;";
+            cmd.CommandText = "UPDATE networkmetrics SET value = @value, time = @time WHERE id=@id;";
             cmd.Parameters.AddWithValue("@id", item.Id);
             cmd.Parameters.AddWithValue("@value", item.Value);
             cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
@@ -66,16 +91,16 @@ namespace MetricsAgent.DAL
             cmd.ExecuteNonQuery();
         }
 
-        public IList<DotNetMetric> GetAll()
+        public IList<NetworkMetric> GetAll()
         {
             using var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
             using var cmd = new SQLiteCommand(connection);
 
             // Прописываем в команду SQL-запрос на получение всех данных из таблицы
-            cmd.CommandText = "SELECT * FROM DotNetMetric";
+            cmd.CommandText = "SELECT * FROM networkmetrics";
 
-            var returnList = new List<DotNetMetric>();
+            var returnList = new List<NetworkMetric>();
 
             using (SQLiteDataReader reader = cmd.ExecuteReader())
             {
@@ -83,7 +108,7 @@ namespace MetricsAgent.DAL
                 while (reader.Read())
                 {
                     // Добавляем объект в список возврата
-                    returnList.Add(new DotNetMetric
+                    returnList.Add(new NetworkMetric
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(1),
@@ -96,19 +121,19 @@ namespace MetricsAgent.DAL
             return returnList;
         }
 
-        public DotNetMetric GetById(int id)
+        public NetworkMetric GetById(int id)
         {
             using var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
             using var cmd = new SQLiteCommand(connection);
-            cmd.CommandText = "SELECT * FROM DotNetMetric WHERE id=@id";
+            cmd.CommandText = "SELECT * FROM networkmetrics WHERE id=1";
             using (SQLiteDataReader reader = cmd.ExecuteReader())
             {
                 // Если удалось что-то прочитать
                 if (reader.Read())
                 {
                     // возвращаем прочитанное
-                    return new DotNetMetric
+                    return new NetworkMetric
                     {
                         Id = reader.GetInt32(0),
                         Value = reader.GetInt32(1),

@@ -35,6 +35,8 @@ namespace MetricsAgent.Controllers
                 Value = request.Value
             });
 
+            _logger.LogInformation("CpuMetrics.create");
+
             return Ok();
         }
 

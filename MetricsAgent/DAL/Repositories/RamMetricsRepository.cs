@@ -1,4 +1,5 @@
-﻿using MetricsAgent.Models;
+﻿using Dapper;
+using MetricsAgent.Models;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
@@ -32,9 +33,11 @@ namespace MetricsAgent.DAL
 
 
                 command.CommandText = @"CREATE TABLE rammetrics(id INTEGER PRIMARY KEY,
-                    value INT, time INT)";
+                    value INT, time INTEGER)";
                 command.ExecuteNonQuery();
             }
+
+            SqlMapper.AddTypeHandler(new TimeSpanHandler());
         }
 
         // Инжектируем соединение с базой данных в наш репозиторий через конструктор
