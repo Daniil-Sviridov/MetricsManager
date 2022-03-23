@@ -39,7 +39,7 @@ namespace MetricsAgent.Controllers
         }
 
         [HttpDelete("delete")]
-        public IActionResult Delete([FromRoute] int id)
+        public IActionResult Delete([FromQuery] int id)
         {
             _repository.Delete(id);
             return Ok();
@@ -71,7 +71,7 @@ namespace MetricsAgent.Controllers
         }
 
         [HttpGet("get")]
-        public IActionResult Get([FromRoute] int id)
+        public IActionResult Get([FromQuery] int id)
         {
             var metric = _repository.GetById(id);
 
