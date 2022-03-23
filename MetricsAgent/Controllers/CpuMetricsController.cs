@@ -1,11 +1,13 @@
 ﻿using MetricsAgent.DAL;
 using MetricsAgent.DTO;
+using Core;
 using MetricsAgent.Models;
 using MetricsAgent.Requests;
 using MetricsAgent.Responses;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Data.SQLite;
+using AutoMapper;
 
 namespace MetricsAgent.Controllers
 {
@@ -17,11 +19,16 @@ namespace MetricsAgent.Controllers
     {
         private readonly ICpuMetricsRepository _repository;
         private readonly ILogger<CpuMetricsController> _logger;
+        private readonly IMapper _mapper;
+        //private readonly INotifierMediatorService _notifierMediatorService;
 
-        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository)
+
+        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
+           // _notifierMediatorService = notifierMediatorService;
 
             _logger.LogInformation("NLog встроен в CpuMetricsController");
         }
@@ -57,7 +64,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("all")]
         public IActionResult GetAll()
         {
-            var metrics = _repository.GetAll();
+            IList<CpuMetric> metrics = _repository.GetAll();
 
             var response = new AllMetricsResponse<CpuMetricDto>()
             {
@@ -66,7 +73,9 @@ namespace MetricsAgent.Controllers
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new CpuMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+                // response.Metrics.Add(new CpuMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+                response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
+
             }
 
             return Ok(response);
@@ -75,7 +84,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("get")]
         public IActionResult Get([FromRoute] int id)
         {
-            var metric = _repository.GetById(id);
+            var metric = _mapper.Map<CpuMetricDto>(_repository.GetById(id));
 
             return Ok(metric);
         }

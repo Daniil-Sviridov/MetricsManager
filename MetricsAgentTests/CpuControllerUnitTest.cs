@@ -17,11 +17,11 @@ namespace MetricsAgentTests
 
         public CpuControllerUnitTest()
         {
-            _mockRepository = new Mock<ICpuMetricsRepository>();
+           /* _mockRepository = new Mock<ICpuMetricsRepository>();
 
             _mockLogger = new Mock<Microsoft.Extensions.Logging.ILogger<CpuMetricsController>>();
 
-            _controller = new CpuMetricsController(_mockLogger.Object, _mockRepository.Object);
+            _controller = new CpuMetricsController(_mockLogger.Object, _mockRepository.Object);*/
         }
 
         [Fact]

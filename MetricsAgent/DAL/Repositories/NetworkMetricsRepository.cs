@@ -40,111 +40,59 @@ namespace MetricsAgent.DAL
             SqlMapper.AddTypeHandler(new TimeSpanHandler());
         }
 
-        // Инжектируем соединение с базой данных в наш репозиторий через конструктор
-
         public void Create(NetworkMetric item)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            // Создаём команду
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на вставку данных
-            cmd.CommandText = "INSERT INTO networkmetrics(value, time) VALUES(@value, @time)";
-
-            // Добавляем параметры в запрос из нашего объекта
-            cmd.Parameters.AddWithValue("@value", item.Value);
-
-            // В таблице будем хранить время в секундах, поэтому преобразуем перед записью в секунды
-            // через свойство
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
-            // подготовка команды к выполнению
-            cmd.Prepare();
-
-            // Выполнение команды
-            cmd.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Execute("INSERT INTO networkmetrics(value, time) VALUES(@value, @time)",
+                new
+                {
+                    value = item.Value,
+                    time = item.Time.TotalSeconds
+                });
+            }
         }
 
         public void Delete(int id)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на удаление данных
-            cmd.CommandText = "DELETE FROM networkmetrics WHERE id=@id";
-
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.Prepare();
-            cmd.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Execute("DELETE FROM networkmetrics WHERE id=@id",
+                new
+                {
+                    id = id
+                });
+            }
         }
 
         public void Update(NetworkMetric item)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на обновление данных
-            cmd.CommandText = "UPDATE networkmetrics SET value = @value, time = @time WHERE id=@id;";
-            cmd.Parameters.AddWithValue("@id", item.Id);
-            cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
-            cmd.Prepare();
-
-            cmd.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Execute("UPDATE networkmetrics SET value = @value, time = @time WHERE id = @id",
+                new
+                {
+                    value = item.Value,
+                    time = item.Time.TotalSeconds,
+                    id = item.Id
+                });
+            }
         }
 
         public IList<NetworkMetric> GetAll()
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-
-            // Прописываем в команду SQL-запрос на получение всех данных из таблицы
-            cmd.CommandText = "SELECT * FROM networkmetrics";
-
-            var returnList = new List<NetworkMetric>();
-
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            using (var connection = new SQLiteConnection(ConnectionString))
             {
-                // Пока есть что читать — читаем
-                while (reader.Read())
-                {
-                    // Добавляем объект в список возврата
-                    returnList.Add(new NetworkMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        // Налету преобразуем прочитанные секунды в метку времени
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
-                    });
-                }
+                return connection.Query<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics").ToList();
             }
-
-            return returnList;
         }
 
         public NetworkMetric GetById(int id)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            cmd.CommandText = "SELECT * FROM networkmetrics WHERE id=1";
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+
+            using (var connection = new SQLiteConnection(ConnectionString))
             {
-                // Если удалось что-то прочитать
-                if (reader.Read())
-                {
-                    // возвращаем прочитанное
-                    return new NetworkMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(1))
-                    };
-                }
-                else
-                {
-                    // Не нашлась запись по идентификатору, не делаем ничего
-                    return null;
-                }
+                return connection.QuerySingle<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics WHERE id = @id", new { id = id });
             }
         }
     }

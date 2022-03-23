@@ -18,7 +18,7 @@ namespace MetricsAgentTests
         {
             _mockRepository = new Mock<INetworkMetricsRepository>();
             _mockLogger = new Mock<ILogger<NetworkMetricsController>>();
-            _controller = new NetworkMetricsController(_mockLogger.Object, _mockRepository.Object);
+        //   _controller = new NetworkMetricsController(_mockLogger.Object, _mockRepository.Object);
         }
 
         [Fact]

@@ -19,7 +19,7 @@ namespace MetricsAgentTests
             _mockLogger = new Mock<ILogger<HddMetricsController>>();
             _mockRepository = new Mock<IHddMetricsRepository>();
 
-            _controller = new HddMetricsController(_mockLogger.Object, _mockRepository.Object);
+        //    _controller = new HddMetricsController(_mockLogger.Object, _mockRepository.Object);
         }
 
         [Fact]

@@ -44,107 +44,59 @@ namespace MetricsAgent.DAL
 
         public void Create(DotNetMetric item)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            // Создаём команду
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на вставку данных
-            cmd.CommandText = "INSERT INTO DotNetMetric(value, time) VALUES(@value, @time)";
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Execute("INSERT INTO dotnetmetrics(value, time) VALUES(@value, @time)",
+                new
+                {
+                    value = item.Value,
+                    time = item.Time.TotalSeconds
+                });
+            }
 
-            // Добавляем параметры в запрос из нашего объекта
-            cmd.Parameters.AddWithValue("@value", item.Value);
-
-            // В таблице будем хранить время в секундах, поэтому преобразуем перед записью в секунды
-            // через свойство
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
-            // подготовка команды к выполнению
-            cmd.Prepare();
-
-            // Выполнение команды
-            cmd.ExecuteNonQuery();
         }
 
         public void Delete(int id)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на удаление данных
-            cmd.CommandText = "DELETE FROM DotNetMetric WHERE id=@id";
-
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.Prepare();
-            cmd.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Execute("DELETE FROM dotnetmetrics WHERE id=@id",
+                new
+                {
+                    id = id
+                });
+            }
         }
 
         public void Update(DotNetMetric item)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на обновление данных
-            cmd.CommandText = "UPDATE DotNetMetric SET value = @value, time = @time WHERE id=@id;";
-            cmd.Parameters.AddWithValue("@id", item.Id);
-            cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
-            cmd.Prepare();
-
-            cmd.ExecuteNonQuery();
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                connection.Execute("UPDATE dotnetmetrics SET value = @value, time = @time WHERE id = @id",
+                new
+                {
+                    value = item.Value,
+                    time = item.Time.TotalSeconds,
+                    id = item.Id
+                });
+            }
         }
 
         public IList<DotNetMetric> GetAll()
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-
-            // Прописываем в команду SQL-запрос на получение всех данных из таблицы
-            cmd.CommandText = "SELECT * FROM DotNetMetric";
-
-            var returnList = new List<DotNetMetric>();
-
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            using (var connection = new SQLiteConnection(ConnectionString))
             {
-                // Пока есть что читать — читаем
-                while (reader.Read())
-                {
-                    // Добавляем объект в список возврата
-                    returnList.Add(new DotNetMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        // Налету преобразуем прочитанные секунды в метку времени
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
-                    });
-                }
+                return connection.Query<DotNetMetric>("SELECT Id, Time, Value FROM dotnetmetrics").ToList();
             }
-
-            return returnList;
         }
 
         public DotNetMetric GetById(int id)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            cmd.CommandText = "SELECT * FROM DotNetMetric WHERE id=@id";
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+
+            using (var connection = new SQLiteConnection(ConnectionString))
             {
-                // Если удалось что-то прочитать
-                if (reader.Read())
-                {
-                    // возвращаем прочитанное
-                    return new DotNetMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(1))
-                    };
-                }
-                else
-                {
-                    // Не нашлась запись по идентификатору, не делаем ничего
-                    return null;
-                }
+                return connection.QuerySingle<DotNetMetric>("SELECT Id, Time, Value FROM dotnetmetrics WHERE id = @id",
+                new { id = id });
             }
         }
     }

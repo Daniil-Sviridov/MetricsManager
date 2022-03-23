@@ -3,10 +3,6 @@ public interface IRepository
 {
 }
 
-public class NullRepository : IRepository
-{ 
-}
-
 public interface IRepository<T> where T : class
 {
     IList<T> GetAll();

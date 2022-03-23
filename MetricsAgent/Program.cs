@@ -1,3 +1,5 @@
+using AutoMapper;
+using MetricsAgent;
 using MetricsAgent.DAL;
 using NLog;
 using NLog.Web;
@@ -6,6 +8,9 @@ NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurr
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 var builder = WebApplication.CreateBuilder(args);
+
+var mapperConfiguration = new MapperConfiguration(mp => mp.AddProfile(new MapperProfile()));
+var mapper = mapperConfiguration.CreateMapper();
 
 // Add services to the container.
 builder.Services.AddControllers();
@@ -24,12 +29,14 @@ logger.Debug("Приложение запущено.");
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddSingleton<IRepository, NullRepository>();
+//builder.Services.AddSingleton<IRepository, NullRepository>();
 builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
 builder.Services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
 builder.Services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
 builder.Services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
 builder.Services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
+
+builder.Services.AddSingleton(mapper);
 
 var app = builder.Build();
 

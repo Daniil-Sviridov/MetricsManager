@@ -88,12 +88,8 @@ namespace MetricsAgent.DAL
         {
             using (var connection = new SQLiteConnection(ConnectionString))
             {
-                // Читаем, используя Query, и в шаблон подставляем тип данных,
-                // объект которого Dapper, он сам заполнит его поля
-                // в соответствии с названиями колонок
                 return connection.Query<CpuMetric>("SELECT Id, Time, Value FROM cpumetrics").ToList();
             }
-
         }
 
         public CpuMetric GetById(int id)

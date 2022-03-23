@@ -1,4 +1,5 @@
-﻿using MetricsAgent.DAL;
+﻿using AutoMapper;
+using MetricsAgent.DAL;
 using MetricsAgent.DTO;
 using MetricsAgent.Models;
 using MetricsAgent.Requests;
@@ -14,11 +15,13 @@ namespace MetricsAgent.Controllers
     {
         private readonly IDotNetMetricsRepository _repository;
         private readonly ILogger<DotNetMetricsController> _logger;
+        private readonly IMapper _mapper;
 
-        public DotNetMetricsController(ILogger<DotNetMetricsController> logger, IDotNetMetricsRepository repository)
+        public DotNetMetricsController(ILogger<DotNetMetricsController> logger, IDotNetMetricsRepository repository, IMapper mapper)
         {
             _repository = repository;
             _logger = logger;
+            _mapper = mapper;
 
             _logger.LogInformation("NLog встроен в DotNetMetricsController");
         }
@@ -61,7 +64,7 @@ namespace MetricsAgent.Controllers
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new DotNetMetricDto { Time = metric.Time, Value = metric.Value, Id = metric.Id });
+                response.Metrics.Add(_mapper.Map<DotNetMetricDto>(metric));
             }
 
             return Ok(response);
@@ -70,7 +73,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("get")]
         public IActionResult Get([FromRoute] int id)
         {
-            var metric = _repository.GetById(id);
+            var metric = _mapper.Map<DotNetMetricDto>(_repository.GetById(id));
 
             return Ok(metric);
         }
