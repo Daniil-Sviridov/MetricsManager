@@ -95,5 +95,14 @@ namespace MetricsAgent.DAL
                 return connection.QuerySingle<HddMetric>("SELECT Id, Time, Value FROM hddmetrics WHERE id = @id", new { id = id });
             }
         }
+
+        public IList<HddMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<HddMetric>("SELECT id, value, time FROM hddmetrics WHERE time>@fromTime AND time<@toTime",
+                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+            }
+        }
     }
 }

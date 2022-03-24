@@ -95,5 +95,14 @@ namespace MetricsAgent.DAL
                 return connection.QuerySingle<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics WHERE id = @id", new { id = id });
             }
         }
+
+        public IList<NetworkMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<NetworkMetric>("SELECT id, value, time FROM networkmetrics WHERE time>@fromTime AND time<@toTime",
+                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+            }
+        }
     }
 }

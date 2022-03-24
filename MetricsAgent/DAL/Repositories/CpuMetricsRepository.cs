@@ -101,5 +101,14 @@ namespace MetricsAgent.DAL
             }
 
         }
+
+        public IList<CpuMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<CpuMetric>("SELECT id, value, time FROM cpumetrics WHERE time>@fromTime AND time<@toTime",
+                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+            }
+        }
     }
 }

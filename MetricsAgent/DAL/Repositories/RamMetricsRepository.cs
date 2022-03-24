@@ -96,5 +96,14 @@ namespace MetricsAgent.DAL
                 return connection.QuerySingle<RamMetric>("SELECT Id, Time, Value FROM rammetrics WHERE id = @id", new { id = id });
             }
         }
+
+        public IList<RamMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using (var connection = new SQLiteConnection(ConnectionString))
+            {
+                return connection.Query<RamMetric>("SELECT id, value, time FROM rammetrics WHERE time>@fromTime AND time<@toTime",
+                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+            }
+        }
     }
 }

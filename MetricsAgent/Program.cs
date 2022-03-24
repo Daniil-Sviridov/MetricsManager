@@ -1,8 +1,12 @@
 using AutoMapper;
 using MetricsAgent;
 using MetricsAgent.DAL;
+using MetricsAgent.Jobs;
 using NLog;
 using NLog.Web;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 
 NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
 
@@ -35,6 +39,27 @@ builder.Services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>
 builder.Services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
 builder.Services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
 builder.Services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
+
+
+builder.Services.AddSingleton<IJobFactory, SingletonJobFactory>();
+builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+
+// Добавляем задачи
+builder.Services.AddSingleton<CpuMetricJob>();
+builder.Services.AddSingleton<DotNetMetricJob>();
+builder.Services.AddSingleton<HddMetricJob>();
+builder.Services.AddSingleton<NetworkMetricJob>();
+builder.Services.AddSingleton<RamMetricJob>();
+
+string stringExpression = "0/5 * * * * ?"; // Запускать каждые 5 секунд
+
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(CpuMetricJob)    , cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(DotNetMetricJob) , cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(HddMetricJob)    , cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(NetworkMetricJob), cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(RamMetricJob)    , cronExpression: stringExpression));
+
+builder.Services.AddHostedService<QuartzHostedService>();
 
 builder.Services.AddSingleton(mapper);
 
