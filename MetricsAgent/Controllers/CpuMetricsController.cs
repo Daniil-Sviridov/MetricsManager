@@ -20,6 +20,7 @@ namespace MetricsAgent.Controllers
         private readonly ICpuMetricsRepository _repository;
         private readonly ILogger<CpuMetricsController> _logger;
         private readonly IMapper _mapper;
+
         //private readonly INotifierMediatorService _notifierMediatorService;
 
 

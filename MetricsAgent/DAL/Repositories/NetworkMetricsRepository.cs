@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MetricsAgent.Models;
 using System;
+using Core;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -15,11 +16,13 @@ namespace MetricsAgent.DAL
 
     public class NetworkMetricsRepository : INetworkMetricsRepository
     {
-        private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+        private readonly IConnectionManager _connectionManager;
 
-        public NetworkMetricsRepository()
+        public NetworkMetricsRepository(IConnectionManager connectionManager)
         {
-            const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+            _connectionManager = connectionManager;
+
+            /*const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
             var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
 
@@ -35,15 +38,15 @@ namespace MetricsAgent.DAL
                 command.CommandText = @"CREATE TABLE networkmetrics(id INTEGER PRIMARY KEY,
                     value INT, time INTEGER)";
                 command.ExecuteNonQuery();
-            }
+            }*/
 
             SqlMapper.AddTypeHandler(new TimeSpanHandler());
         }
 
         public void Create(NetworkMetric item)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
-            {
+            using (var connection = _connectionManager.CreateOpenedConnection())
+            {                                                
                 connection.Execute("INSERT INTO networkmetrics(value, time) VALUES(@value, @time)",
                 new
                 {
@@ -55,7 +58,7 @@ namespace MetricsAgent.DAL
 
         public void Delete(int id)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("DELETE FROM networkmetrics WHERE id=@id",
                 new
@@ -67,7 +70,7 @@ namespace MetricsAgent.DAL
 
         public void Update(NetworkMetric item)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("UPDATE networkmetrics SET value = @value, time = @time WHERE id = @id",
                 new
@@ -81,7 +84,7 @@ namespace MetricsAgent.DAL
 
         public IList<NetworkMetric> GetAll()
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics").ToList();
             }
@@ -90,7 +93,7 @@ namespace MetricsAgent.DAL
         public NetworkMetric GetById(int id)
         {
 
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.QuerySingle<NetworkMetric>("SELECT Id, Time, Value FROM networkmetrics WHERE id = @id", new { id = id });
             }
@@ -98,7 +101,7 @@ namespace MetricsAgent.DAL
 
         public IList<NetworkMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<NetworkMetric>("SELECT id, value, time FROM networkmetrics WHERE time>@fromTime AND time<@toTime",
                 new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();

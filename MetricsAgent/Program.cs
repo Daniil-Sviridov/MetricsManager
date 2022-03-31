@@ -8,6 +8,17 @@ using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
 
+using Core;
+
+using FluentMigrator;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
+
+using Newtonsoft.Json;
+
+using Microsoft.OpenApi.Models;
+using System.Reflection;
+
 NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
 
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
@@ -63,6 +74,44 @@ builder.Services.AddHostedService<QuartzHostedService>();
 
 builder.Services.AddSingleton(mapper);
 
+builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+
+/*builder.Services.AddFluentMigratorCore().ConfigureRunner(rb => rb.AddSQLite().WithGlobalConnectionString(ConnectionManager.ConnectionString)).AddLogging(lb => lb.AddFluentMigratorConsole());
+
+var appSettings = new AppSettings();
+builder.Configuration.Bind(appSettings);
+
+string migrationAssemblyPath = Path.Combine(appSettings.ExecutingAssembly.Location.LeftOfRightmostOf("\\"), appSettings.MigrationAssembly);
+
+Assembly migrationAssembly = Assembly.LoadFrom(migrationAssemblyPath);*/
+
+
+var serviceProvider = new ServiceCollection()
+        // Add common FluentMigrator services
+        .AddFluentMigratorCore()
+        .ConfigureRunner(rb => rb
+            // Add SQLite support to FluentMigrator
+            .AddSQLite()
+            // Set the connection string
+            .WithGlobalConnectionString(ConnectionManager.ConnectionString)
+            // Define the assembly containing the migrations
+            .ScanIn(typeof(FirstMigration).Assembly).For.Migrations())
+        // Enable logging to console in the FluentMigrator way
+        .AddLogging(lb => lb.AddFluentMigratorConsole())
+        // Build the service provider
+        .BuildServiceProvider(false);
+
+// Put the database update into a scope to ensure
+// that all resources will be disposed.
+using (var scope = serviceProvider.CreateScope())
+{
+    // Instantiate the runner
+    var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+    // Execute the migrations
+    runner.MigrateUp();
+}
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -75,4 +124,5 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.MapControllers();
+
 app.Run();

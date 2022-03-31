@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MetricsAgent.Models;
 using System;
+using Core;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -13,11 +14,13 @@ namespace MetricsAgent.DAL
 
     public class HddMetricsRepository : IHddMetricsRepository
     {
-        private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+        private readonly IConnectionManager _connectionManager;
 
-        public HddMetricsRepository()
+        public HddMetricsRepository(IConnectionManager connectionManager)
         {
-            const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+            _connectionManager = connectionManager;
+
+            /*const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
             var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
 
@@ -33,7 +36,7 @@ namespace MetricsAgent.DAL
                 command.CommandText = @"CREATE TABLE hddmetrics(id INTEGER PRIMARY KEY,
                     value INT, time INTEGER)";
                 command.ExecuteNonQuery();
-            }
+            }*/
 
             SqlMapper.AddTypeHandler(new TimeSpanHandler());
 
@@ -42,7 +45,7 @@ namespace MetricsAgent.DAL
 
         public void Create(HddMetric item)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("INSERT INTO hddmetrics(value, time) VALUES(@value, @time)",
                 new
@@ -55,7 +58,7 @@ namespace MetricsAgent.DAL
 
         public void Delete(int id)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("DELETE FROM hddmetrics WHERE id=@id",
                 new
@@ -67,7 +70,7 @@ namespace MetricsAgent.DAL
 
         public void Update(HddMetric item)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("UPDATE hddmetrics SET value = @value, time = @time WHERE id = @id",
                 new
@@ -81,7 +84,7 @@ namespace MetricsAgent.DAL
 
         public IList<HddMetric> GetAll()
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<HddMetric>("SELECT Id, Time, Value FROM hddmetrics").ToList();
             }
@@ -90,7 +93,7 @@ namespace MetricsAgent.DAL
         public HddMetric GetById(int id)
         {
 
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.QuerySingle<HddMetric>("SELECT Id, Time, Value FROM hddmetrics WHERE id = @id", new { id = id });
             }
@@ -98,7 +101,7 @@ namespace MetricsAgent.DAL
 
         public IList<HddMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<HddMetric>("SELECT id, value, time FROM hddmetrics WHERE time>@fromTime AND time<@toTime",
                 new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();

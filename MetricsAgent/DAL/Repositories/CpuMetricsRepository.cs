@@ -1,6 +1,7 @@
 ﻿using Dapper;
 using MetricsAgent.Models;
 using System;
+using Core;
 using System.Collections.Generic;
 using System.Data.SQLite;
 
@@ -15,11 +16,15 @@ namespace MetricsAgent.DAL
 
     public class CpuMetricsRepository : ICpuMetricsRepository
     {
-        private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+        private readonly IConnectionManager _connectionManager;
 
-        public CpuMetricsRepository()
+        //private string ConnectionString = "Data Source=metrics11.db;Version=3;Pooling=true;Max Pool Size=100;";
+
+        public CpuMetricsRepository(IConnectionManager connectionManager)
         {
-            const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
+            _connectionManager = connectionManager;
+
+            /*const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
             var connection = new SQLiteConnection(ConnectionString);
             connection.Open();
 
@@ -35,7 +40,7 @@ namespace MetricsAgent.DAL
                 command.CommandText = @"CREATE TABLE cpumetrics(id INTEGER PRIMARY KEY,
                     value INT, time INTEGER)";
                 command.ExecuteNonQuery();
-            }
+            }*/
 
             SqlMapper.AddTypeHandler(new TimeSpanHandler());
 
@@ -45,7 +50,7 @@ namespace MetricsAgent.DAL
 
         public void Create(CpuMetric item)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 // Запрос на вставку данных с плейсхолдерами для параметров
                 connection.Execute("INSERT INTO cpumetrics(value, time) VALUES(@value, @time)",
@@ -60,7 +65,7 @@ namespace MetricsAgent.DAL
 
         public void Delete(int id)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("DELETE FROM cpumetrics WHERE id=@id",
                 new
@@ -71,7 +76,7 @@ namespace MetricsAgent.DAL
         }
         public void Update(CpuMetric item)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 connection.Execute("UPDATE cpumetrics SET value = @value, time = @time WHERE id = @id",
                 new
@@ -86,7 +91,7 @@ namespace MetricsAgent.DAL
 
         public IList<CpuMetric> GetAll()
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<CpuMetric>("SELECT Id, Time, Value FROM cpumetrics").ToList();
             }
@@ -94,7 +99,7 @@ namespace MetricsAgent.DAL
 
         public CpuMetric GetById(int id)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.QuerySingle<CpuMetric>("SELECT Id, Time, Value FROM cpumetrics WHERE id = @id",
                 new { id = id });
@@ -104,7 +109,7 @@ namespace MetricsAgent.DAL
 
         public IList<CpuMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
         {
-            using (var connection = new SQLiteConnection(ConnectionString))
+            using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<CpuMetric>("SELECT id, value, time FROM cpumetrics WHERE time>@fromTime AND time<@toTime",
                 new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
