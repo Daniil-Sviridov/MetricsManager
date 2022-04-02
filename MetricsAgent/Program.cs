@@ -64,11 +64,11 @@ builder.Services.AddSingleton<RamMetricJob>();
 
 string stringExpression = "0/5 * * * * ?"; // Запускать каждые 5 секунд
 
-builder.Services.AddSingleton(new JobSchedule(jobType: typeof(CpuMetricJob)    , cronExpression: stringExpression));
-builder.Services.AddSingleton(new JobSchedule(jobType: typeof(DotNetMetricJob) , cronExpression: stringExpression));
-builder.Services.AddSingleton(new JobSchedule(jobType: typeof(HddMetricJob)    , cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(CpuMetricJob), cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(DotNetMetricJob), cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(HddMetricJob), cronExpression: stringExpression));
 builder.Services.AddSingleton(new JobSchedule(jobType: typeof(NetworkMetricJob), cronExpression: stringExpression));
-builder.Services.AddSingleton(new JobSchedule(jobType: typeof(RamMetricJob)    , cronExpression: stringExpression));
+builder.Services.AddSingleton(new JobSchedule(jobType: typeof(RamMetricJob), cronExpression: stringExpression));
 
 builder.Services.AddHostedService<QuartzHostedService>();
 

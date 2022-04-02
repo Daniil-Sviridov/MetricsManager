@@ -1,5 +1,12 @@
+
+using Core;
+using MetricsManager.DAL;
+using MetricsManager.Jobs;
 using NLog;
 using NLog.Web;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 
 NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
 
@@ -21,6 +28,26 @@ try
     builder.Host.UseNLog();
 
     logger.Debug("Приложение запущено.");
+
+    builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
+
+    builder.Services.AddSingleton<IJobFactory, SingletonJobFactory>();
+    builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+
+    // Добавляем задачи
+    builder.Services.AddSingleton<CpuMetricJob>();
+  
+
+    string stringExpression = "0/5 * * * * ?"; // Запускать каждые 5 секунд
+
+    builder.Services.AddSingleton(new JobSchedule(jobType: typeof(CpuMetricJob), cronExpression: stringExpression));
+
+    builder.Services.AddHostedService<QuartzHostedService>();
+
+    //builder.Services.AddSingleton(mapper);
+
+    builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
+
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
