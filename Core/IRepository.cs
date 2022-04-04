@@ -7,7 +7,7 @@ public interface IRepository<T> where T : class
 {
     IList<T> GetAll();
 
-    IList<T> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime);
+    IList<T> GetMetricsOutPeriod(long fromTime, long toTime);
 
     T GetById(int id);
 

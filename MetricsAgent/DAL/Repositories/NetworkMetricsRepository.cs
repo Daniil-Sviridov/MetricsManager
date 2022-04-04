@@ -40,7 +40,7 @@ namespace MetricsAgent.DAL
                 command.ExecuteNonQuery();
             }*/
 
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            //SqlMapper.AddTypeHandler(new TimeSpanHandler());
         }
 
         public void Create(NetworkMetric item)
@@ -99,12 +99,12 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public IList<NetworkMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        public IList<NetworkMetric> GetMetricsOutPeriod(long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<NetworkMetric>("SELECT id, value, time FROM networkmetrics WHERE time>@fromTime AND time<@toTime",
-                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+                new { fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
     }

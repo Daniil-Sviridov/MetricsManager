@@ -1,6 +1,10 @@
 
 using Core;
+using FluentMigrator.Runner;
+using MetricsManager.Client;
 using MetricsManager.DAL;
+using MetricsManager.DAL.Migrations;
+using MetricsManager.DAL.Repositories;
 using MetricsManager.Jobs;
 using NLog;
 using NLog.Web;
@@ -29,6 +33,7 @@ try
 
     logger.Debug("Приложение запущено.");
 
+    builder.Services.AddSingleton<IAgentsRepository, AgentsRepository>();
     builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
 
     builder.Services.AddSingleton<IJobFactory, SingletonJobFactory>();
@@ -48,9 +53,38 @@ try
 
     builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
+    builder.Services.AddHttpClient<IMetricsAgentClient,MetricsAgentClient>();
+    //.AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _=> TimeSpan.FromMilliseconds(1000)))
+
 
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
+
+    var serviceProvider = new ServiceCollection()
+        // Add common FluentMigrator services
+        .AddFluentMigratorCore()
+        .ConfigureRunner(rb => rb
+            // Add SQLite support to FluentMigrator
+            .AddSQLite()
+            // Set the connection string
+            .WithGlobalConnectionString(ConnectionManager.ConnectionString)
+            // Define the assembly containing the migrations
+            .ScanIn(typeof(FirstMigration).Assembly).For.Migrations())
+        // Enable logging to console in the FluentMigrator way
+        .AddLogging(lb => lb.AddFluentMigratorConsole())
+        // Build the service provider
+        .BuildServiceProvider(false);
+
+    // Put the database update into a scope to ensure
+    // that all resources will be disposed.
+    using (var scope = serviceProvider.CreateScope())
+    {
+        // Instantiate the runner
+        var runner = scope.ServiceProvider.GetRequiredService<IMigrationRunner>();
+
+        // Execute the migrations
+        runner.MigrateUp();
+    }
 
     var app = builder.Build();
 

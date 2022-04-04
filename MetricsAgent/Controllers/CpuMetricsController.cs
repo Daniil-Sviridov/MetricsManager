@@ -35,14 +35,15 @@ namespace MetricsAgent.Controllers
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        public IActionResult GetMetricsFromAgent([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
-            var metrics = _repository.GetMetricsOutPeriod(fromTime, toTime);
+            var metrics = _repository.GetMetricsOutPeriod(fromTime.ToUnixTimeSeconds(), toTime.ToUnixTimeSeconds());
             var response = new AllMetricsResponse<CpuMetricDto>();
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
+                response.Metrics.Add(new CpuMetricDto { Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), Value = metric.Value});
+                //response.Metrics.Add(_mapper.Map<CpuMetricDto>(metric));
             }
             return Ok(response);
         }

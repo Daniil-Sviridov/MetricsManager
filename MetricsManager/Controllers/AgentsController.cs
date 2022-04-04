@@ -1,4 +1,5 @@
-﻿using MetricsManager.Model;
+﻿using MetricsManager.DAL.Repositories;
+using MetricsManager.Model;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,11 +10,31 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class AgentsController : ControllerBase
     {
+        private readonly IAgentsRepository _repository;
+
+        public AgentsController(IAgentsRepository repository)
+        {
+
+            _repository = repository;
+        }
+
         [HttpPost("register")]
         public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
         {
+
+            _repository.Create(new AgentInfo() { AgentAddress = agentInfo.AgentAddress, IsEnabled = true });
+
             return Ok();
         }
+
+        /*[HttpGet("register")]
+        public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
+        {
+
+            _repository.Create(new AgentInfo() { AgentAddress = agentInfo.AgentAddress, IsEnabled = true });
+
+            return Ok();
+        }*/
 
         [HttpPut("enable/{agentId}")]
         public IActionResult EnableAgentById([FromRoute] int agentId)

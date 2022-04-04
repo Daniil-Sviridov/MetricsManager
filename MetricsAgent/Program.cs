@@ -24,9 +24,6 @@ NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurr
 var logger = NLog.LogManager.Setup().LoadConfigurationFromAppSettings().GetCurrentClassLogger();
 var builder = WebApplication.CreateBuilder(args);
 
-var mapperConfiguration = new MapperConfiguration(mp => mp.AddProfile(new MapperProfile()));
-var mapper = mapperConfiguration.CreateMapper();
-
 // Add services to the container.
 builder.Services.AddControllers();
 
@@ -43,6 +40,10 @@ logger.Debug("Приложение запущено.");
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+var mapperConfiguration = new MapperConfiguration(mp => mp.AddProfile(new MapperProfile()));
+var mapper = mapperConfiguration.CreateMapper();
+builder.Services.AddSingleton(mapper);
 
 //builder.Services.AddSingleton<IRepository, NullRepository>();
 builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
@@ -72,7 +73,7 @@ builder.Services.AddSingleton(new JobSchedule(jobType: typeof(RamMetricJob), cro
 
 builder.Services.AddHostedService<QuartzHostedService>();
 
-builder.Services.AddSingleton(mapper);
+
 
 builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 

@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Data.SQLite;
 using MetricsManager.Models;
 
-namespace MetricsManager.DAL
+namespace MetricsManager.DAL.Repositories
 {
     // Маркировочный интерфейс
     // используется, чтобы проверять работу репозитория на тесте-заглушке
@@ -32,14 +32,16 @@ namespace MetricsManager.DAL
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                // Запрос на вставку данных с плейсхолдерами для параметров
+
+                int a = 1;
+                /*/ Запрос на вставку данных с плейсхолдерами для параметров
                 connection.Execute("INSERT INTO cpumetrics(value, time) VALUES(@value, @time)",
                 // Анонимный объект с параметрами запроса
                 new
                 {
                     value = item.Value,
                     time = item.Time.TotalSeconds
-                });
+                });*/
             }
         }
 
@@ -62,7 +64,7 @@ namespace MetricsManager.DAL
                 new
                 {
                     value = item.Value,
-                    time = item.Time.TotalSeconds,
+                    time = item.Time.ToUnixTimeSeconds(),
                     id = item.Id
                 });
             }
@@ -87,12 +89,12 @@ namespace MetricsManager.DAL
 
         }
 
-        public IList<CpuMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        public IList<CpuMetric> GetMetricsOutPeriod(long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<CpuMetric>("SELECT id, value, time FROM cpumetrics WHERE time>@fromTime AND time<@toTime",
-                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+                new { fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
     }

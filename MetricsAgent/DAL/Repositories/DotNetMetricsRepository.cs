@@ -42,7 +42,7 @@ namespace MetricsAgent.DAL
                 command.ExecuteNonQuery();
             }*/
 
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            //SqlMapper.AddTypeHandler(new TimeSpanHandler());
 
         }
 
@@ -104,12 +104,12 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public IList<DotNetMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        public IList<DotNetMetric> GetMetricsOutPeriod(long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<DotNetMetric>("SELECT id, value, time FROM dotnetmetrics WHERE time>@fromTime AND time<@toTime",
-                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+                new { fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
     }

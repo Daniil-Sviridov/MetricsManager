@@ -26,10 +26,10 @@ namespace MetricsAgent.Controllers
             _logger.LogInformation("NLog встроен в RamMetricsController");
         }
 
-        [HttpGet("available/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAgent([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        [HttpGet("from/{fromTime}/to/{toTime}")]
+        public IActionResult GetMetricsFromAgent([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
-            var metrics = _repository.GetMetricsOutPeriod(fromTime, toTime);
+            var metrics = _repository.GetMetricsOutPeriod(fromTime.ToUnixTimeSeconds(), toTime.ToUnixTimeSeconds());
             var response = new AllMetricsResponse<RamMetricDto>();
 
             foreach (var metric in metrics)

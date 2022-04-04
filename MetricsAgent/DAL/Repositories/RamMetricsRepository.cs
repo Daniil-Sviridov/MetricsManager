@@ -40,7 +40,7 @@ namespace MetricsAgent.DAL
                 command.ExecuteNonQuery();
             }*/
 
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            //SqlMapper.AddTypeHandler(new TimeSpanHandler());
         }
 
 
@@ -100,12 +100,12 @@ namespace MetricsAgent.DAL
             }
         }
 
-        public IList<RamMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        public IList<RamMetric> GetMetricsOutPeriod(long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<RamMetric>("SELECT id, value, time FROM rammetrics WHERE time>@fromTime AND time<@toTime",
-                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+                new { fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
     }

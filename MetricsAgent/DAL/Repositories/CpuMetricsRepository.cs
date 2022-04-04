@@ -42,7 +42,7 @@ namespace MetricsAgent.DAL
                 command.ExecuteNonQuery();
             }*/
 
-            SqlMapper.AddTypeHandler(new TimeSpanHandler());
+            //SqlMapper.AddTypeHandler(new TimeSpanHandler());
 
         }
 
@@ -58,7 +58,7 @@ namespace MetricsAgent.DAL
                 new
                 {
                     value = item.Value,
-                    time = item.Time.TotalSeconds
+                    time = item.Time
                 });
             }
         }
@@ -82,7 +82,7 @@ namespace MetricsAgent.DAL
                 new
                 {
                     value = item.Value,
-                    time = item.Time.TotalSeconds,
+                    time = item.Time,
                     id = item.Id
                 });
             }
@@ -107,12 +107,12 @@ namespace MetricsAgent.DAL
 
         }
 
-        public IList<CpuMetric> GetMetricsOutPeriod(TimeSpan fromTime, TimeSpan toTime)
+        public IList<CpuMetric> GetMetricsOutPeriod(long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 return connection.Query<CpuMetric>("SELECT id, value, time FROM cpumetrics WHERE time>@fromTime AND time<@toTime",
-                new { fromTime = fromTime.TotalSeconds, toTime = toTime.TotalSeconds }).ToList();
+                new { fromTime = fromTime, toTime = toTime}).ToList();
             }
         }
     }

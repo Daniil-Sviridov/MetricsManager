@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Quartz;
 using Quartz.Spi;
-using MetricsManager.DAL;
+using MetricsManager.DAL.Repositories;
 
 namespace MetricsManager.Jobs
 {

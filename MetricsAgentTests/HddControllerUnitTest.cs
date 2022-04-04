@@ -26,8 +26,8 @@ namespace MetricsAgentTests
         public void GetMetricsFromAgent_ReturnsOk()
         {
             //Arrange
-            var fromTime = TimeSpan.FromSeconds(0);
-            var toTime = TimeSpan.FromSeconds(100);
+            var fromTime = DateTimeOffset.MinValue;
+            var toTime = DateTimeOffset.MinValue;
 
             //Act
             var result = _controller.GetMetricsFromAgent(fromTime, toTime);
