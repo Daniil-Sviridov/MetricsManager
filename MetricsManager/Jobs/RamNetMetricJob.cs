@@ -9,14 +9,14 @@ using System.Diagnostics;
 
 namespace MetricsManager.Jobs
 {
-    public class CpuMetricJob : IJob
+    public class RamMetricJob : IJob
     {
-        private readonly ICpuMetricsRepository _repository;
+        private readonly IRamMetricsRepository _repository;
         private readonly IAgentsRepository _agentsRepository;
         private readonly IMetricsAgentClient _metricsAgentClient;
 
 
-        public CpuMetricJob(ICpuMetricsRepository repository, IAgentsRepository agentsRepository, IMetricsAgentClient metricsAgentClient)
+        public RamMetricJob(IRamMetricsRepository repository, IAgentsRepository agentsRepository, IMetricsAgentClient metricsAgentClient)
         {
             _repository = repository;
             _agentsRepository = agentsRepository;
@@ -30,10 +30,10 @@ namespace MetricsManager.Jobs
             {
                 var minDate = _repository.GetMaxDate(agent.Id);
 
-                MetricsApiResponse<CpuMetricDTO> respMetrics = _metricsAgentClient.GetCpuMetrics(new MetricsApiRequest() { AgentUrl = agent.AgentAddress, FromTime = minDate, ToTime = DateTimeOffset.Now });
+                MetricsApiResponse<RamMetricDTO> respMetrics = _metricsAgentClient.GetRamMetrics(new MetricsApiRequest() { AgentUrl = agent.AgentAddress, FromTime = minDate, ToTime = DateTimeOffset.Now });
                 foreach (var metric in respMetrics.Metrics)
                 {
-                    _repository.Create(new Models.CpuMetric
+                    _repository.Create(new Models.RamMetric
                     {
                         Time = metric.Time.ToUnixTimeSeconds(),
                         Value = metric.Value,

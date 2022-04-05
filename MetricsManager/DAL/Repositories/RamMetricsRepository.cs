@@ -1,15 +1,15 @@
 ﻿using Dapper;
-using MetricsAgent.Models;
 using System;
 using Core;
 using System.Collections.Generic;
 using System.Data.SQLite;
+using MetricsManager.Models;
 
-namespace MetricsAgent.DAL
+namespace MetricsManager.DAL.Repositories
 {
     // Маркировочный интерфейс
     // используется, чтобы проверять работу репозитория на тесте-заглушке
-    public interface IRamMetricsRepository : IRepository<RamMetric>
+    public interface IRamMetricsRepository : IRepositoryMgr<RamMetric>
     {
 
     }
@@ -21,38 +21,22 @@ namespace MetricsAgent.DAL
         public RamMetricsRepository(IConnectionManager connectionManager)
         {
             _connectionManager = connectionManager;
-
-            /*const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
-            var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-
-            using (var command = new SQLiteCommand(connection))
-            {
-                // Задаём новый текст команды для выполнения
-                // Удаляем таблицу с метриками, если она есть в базе данных
-                command.CommandText = "DROP TABLE IF EXISTS rammetrics";
-                // Отправляем запрос в базу данных
-                command.ExecuteNonQuery();
-
-
-                command.CommandText = @"CREATE TABLE rammetrics(id INTEGER PRIMARY KEY,
-                    value INT, time INTEGER)";
-                command.ExecuteNonQuery();
-            }*/
-
-            //SqlMapper.AddTypeHandler(new TimeSpanHandler());
         }
 
+        // Инжектируем соединение с базой данных в наш репозиторий через конструктор
 
         public void Create(RamMetric item)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                connection.Execute("INSERT INTO rammetrics(value, time) VALUES(@value, @time)",
+                // Запрос на вставку данных с плейсхолдерами для параметров
+                connection.Execute("INSERT INTO rammetrics(agentid,value, time) VALUES(@agentid, @value, @time)",
+                // Анонимный объект с параметрами запроса
                 new
                 {
+                    agentid = item.AgentId,
                     value = item.Value,
-                    time = item.Time
+                    time = item.Time,
                 });
             }
         }
@@ -68,7 +52,6 @@ namespace MetricsAgent.DAL
                 });
             }
         }
-
         public void Update(RamMetric item)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
@@ -81,22 +64,23 @@ namespace MetricsAgent.DAL
                     id = item.Id
                 });
             }
+
         }
 
         public IList<RamMetric> GetAll()
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                return connection.Query<RamMetric>("SELECT Id, Time, Value FROM rammetrics").ToList();
+                return connection.Query<RamMetric>("SELECT id, agentid ,time, value FROM rammetrics").ToList();
             }
         }
 
-        public RamMetric GetById(int id)
+        public IList<RamMetric> GetMetricsOutPeriodByAgentId(int agentId, long fromTime, long toTime)
         {
-
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                return connection.QuerySingle<RamMetric>("SELECT Id, Time, Value FROM rammetrics WHERE id = @id", new { id = id });
+                return connection.Query<RamMetric>("SELECT id, agentid, value, time FROM rammetrics WHERE time>@fromTime AND time<@toTime AND agentid = @agentid",
+                new { agentid = agentId, fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
 
@@ -104,14 +88,28 @@ namespace MetricsAgent.DAL
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                return connection.Query<RamMetric>("SELECT id, value, time FROM rammetrics WHERE time>@fromTime AND time<@toTime",
+                return connection.Query<RamMetric>("SELECT id, agentid, value, time FROM rammetrics WHERE time>@fromTime AND time<@toTime",
                 new { fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
 
         public DateTimeOffset GetMaxDate(int agentid)
         {
-            throw new NotImplementedException();
+            long max = 0;
+
+            using (var connection = _connectionManager.CreateOpenedConnection())
+            {
+                try
+                {
+                    max = connection.QuerySingle<long>("SELECT MAX(time) FROM rammetrics where agentid = @agentid", new { agentid = agentid });
+                }
+                catch (Exception ex)
+                {
+                    //_logger.
+                }
+
+                return DateTimeOffset.FromUnixTimeSeconds(max).DateTime;
+            }
         }
     }
 }

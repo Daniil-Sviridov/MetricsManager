@@ -34,62 +34,13 @@ namespace MetricsAgent.Controllers
 
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(_mapper.Map<NetworkMetricDto>(metric));
+                //response.Metrics.Add(_mapper.Map<NetworkMetricDto>(metric));
+
+                response.Metrics.Add(new NetworkMetricDto { Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), Value = metric.Value });
+
             }
 
             return Ok(response);
         }
-        /*    [HttpPost("create")]
-            public IActionResult Create([FromBody] NetworkMetricCreateRequest request)
-            {
-                _repository.Create(new NetworkMetric
-                {
-                    Time = request.Time,
-                    Value = request.Value
-                });
-
-                return Ok();
-            }
-
-            [HttpDelete("delete")]
-            public IActionResult Delete([FromQuery] int id)
-            {
-                _repository.Delete(id);
-                return Ok();
-            }
-
-            [HttpPut("put")]
-            public IActionResult Update([FromBody] NetworkMetric item)
-            {
-                _repository.Update(item);
-                return Ok();
-            }
-
-            [HttpGet("all")]
-            public IActionResult GetAll()
-            {
-                var metrics = _repository.GetAll();
-
-                var response = new AllMetricsResponse<NetworkMetricDto>()
-                {
-                    Metrics = new List<NetworkMetricDto>()
-                };
-
-                foreach (var metric in metrics)
-                {
-                    response.Metrics.Add(_mapper.Map<NetworkMetricDto>(metric));
-                }
-
-                return Ok(response);
-            }
-
-            [HttpGet("get")]
-            public IActionResult Get([FromQuery] int id)
-            {
-                var metric = _repository.GetById(id);
-
-                return Ok(metric);
-            }
-    */
     }
 }

@@ -9,28 +9,28 @@ namespace MetricsManager.DAL.Repositories
 {
     // Маркировочный интерфейс
     // используется, чтобы проверять работу репозитория на тесте-заглушке
-    public interface ICpuMetricsRepository : IRepositoryMgr<CpuMetric>
+    public interface IDotNetMetricsRepository : IRepositoryMgr<DotNetMetric>
     {
 
     }
 
-    public class CpuMetricsRepository : ICpuMetricsRepository
+    public class DotNetMetricsRepository : IDotNetMetricsRepository
     {
         private readonly IConnectionManager _connectionManager;
 
-        public CpuMetricsRepository(IConnectionManager connectionManager)
+        public DotNetMetricsRepository(IConnectionManager connectionManager)
         {
             _connectionManager = connectionManager;
         }
 
         // Инжектируем соединение с базой данных в наш репозиторий через конструктор
 
-        public void Create(CpuMetric item)
+        public void Create(DotNetMetric item)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
                 // Запрос на вставку данных с плейсхолдерами для параметров
-                connection.Execute("INSERT INTO cpumetrics(agentid,value, time) VALUES(@agentid, @value, @time)",
+                connection.Execute("INSERT INTO dotnetmetrics(agentid,value, time) VALUES(@agentid, @value, @time)",
                 // Анонимный объект с параметрами запроса
                 new
                 {
@@ -45,18 +45,18 @@ namespace MetricsManager.DAL.Repositories
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                connection.Execute("DELETE FROM cpumetrics WHERE id=@id",
+                connection.Execute("DELETE FROM dotnetmetrics WHERE id=@id",
                 new
                 {
                     id = id
                 });
             }
         }
-        public void Update(CpuMetric item)
+        public void Update(DotNetMetric item)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                connection.Execute("UPDATE cpumetrics SET value = @value, time = @time WHERE id = @id",
+                connection.Execute("UPDATE dotnetmetrics SET value = @value, time = @time WHERE id = @id",
                 new
                 {
                     value = item.Value,
@@ -67,28 +67,28 @@ namespace MetricsManager.DAL.Repositories
 
         }
 
-        public IList<CpuMetric> GetAll()
+        public IList<DotNetMetric> GetAll()
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                return connection.Query<CpuMetric>("SELECT id, agentid ,time, value FROM cpumetrics").ToList();
+                return connection.Query<DotNetMetric>("SELECT id, agentid ,time, value FROM dotnetmetrics").ToList();
             }
         }
 
-        public IList<CpuMetric> GetMetricsOutPeriodByAgentId(int agentId, long fromTime, long toTime)
+        public IList<DotNetMetric> GetMetricsOutPeriodByAgentId(int agentId, long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                return connection.Query<CpuMetric>("SELECT id, agentid, value, time FROM cpumetrics WHERE time>@fromTime AND time<@toTime AND agentid = @agentid",
+                return connection.Query<DotNetMetric>("SELECT id, agentid, value, time FROM dotnetmetrics WHERE time>@fromTime AND time<@toTime AND agentid = @agentid",
                 new { agentid = agentId, fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
 
-        public IList<CpuMetric> GetMetricsOutPeriod(long fromTime, long toTime)
+        public IList<DotNetMetric> GetMetricsOutPeriod(long fromTime, long toTime)
         {
             using (var connection = _connectionManager.CreateOpenedConnection())
             {
-                return connection.Query<CpuMetric>("SELECT id, agentid, value, time FROM cpumetrics WHERE time>@fromTime AND time<@toTime",
+                return connection.Query<DotNetMetric>("SELECT id, agentid, value, time FROM dotnetmetrics WHERE time>@fromTime AND time<@toTime",
                 new { fromTime = fromTime, toTime = toTime }).ToList();
             }
         }
@@ -101,7 +101,7 @@ namespace MetricsManager.DAL.Repositories
             {
                 try
                 {
-                    max = connection.QuerySingle<long>("SELECT MAX(time) FROM cpumetrics where agentid = @agentid", new { agentid = agentid });
+                    max = connection.QuerySingle<long>("SELECT MAX(time) FROM dotnetmetrics where agentid = @agentid", new { agentid = agentid });
                 }
                 catch (Exception ex)
                 {

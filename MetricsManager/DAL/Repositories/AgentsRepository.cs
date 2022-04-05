@@ -75,7 +75,8 @@ namespace MetricsManager.DAL.Repositories
 
         public IList<AgentInfo> GetMetricsOutPeriod(long fromTime, long toTime)
         {
-           return GetAll();
+            return GetAll();
         }
+
     }
 }

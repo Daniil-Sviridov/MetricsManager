@@ -27,15 +27,6 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
-        /*[HttpGet("register")]
-        public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
-        {
-
-            _repository.Create(new AgentInfo() { AgentAddress = agentInfo.AgentAddress, IsEnabled = true });
-
-            return Ok();
-        }*/
-
         [HttpPut("enable/{agentId}")]
         public IActionResult EnableAgentById([FromRoute] int agentId)
         {
@@ -46,6 +37,12 @@ namespace MetricsManager.Controllers
         public IActionResult DisableAgentById([FromRoute] int agentId)
         {
             return Ok();
+        }
+
+        [HttpGet("all")]
+        public IActionResult GetAll()
+        {
+            return Ok(_repository.GetAll());
         }
     }
 }

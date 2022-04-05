@@ -54,7 +54,7 @@ namespace MetricsAgent.DAL
                 new
                 {
                     value = item.Value,
-                    time = item.Time.TotalSeconds
+                    time = item.Time
                 });
             }
 
@@ -80,7 +80,7 @@ namespace MetricsAgent.DAL
                 new
                 {
                     value = item.Value,
-                    time = item.Time.TotalSeconds,
+                    time = item.Time,
                     id = item.Id
                 });
             }
@@ -111,6 +111,11 @@ namespace MetricsAgent.DAL
                 return connection.Query<DotNetMetric>("SELECT id, value, time FROM dotnetmetrics WHERE time>@fromTime AND time<@toTime",
                 new { fromTime = fromTime, toTime = toTime }).ToList();
             }
+        }
+
+        public DateTimeOffset GetMaxDate(int agentid)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -6,11 +6,11 @@ namespace MetricsManager.Client
 {
     public interface IMetricsAgentClient
     {
-        MetricsApiResponse<CpuMetric> GetCpuMetrics(MetricsApiRequest request);
-        MetricsApiResponse<DotNetMetric> GetDonNetMetrics(MetricsApiRequest request);
-        MetricsApiResponse<HddMetric> GetHddMetrics(MetricsApiRequest request);
-        MetricsApiResponse<NetworkMetric> GetNetworkMetrics(MetricsApiRequest request);
-        MetricsApiResponse<RamMetric> GetRamMetrics(MetricsApiRequest request);
+        MetricsApiResponse<CpuMetricDTO> GetCpuMetrics(MetricsApiRequest request);
+        MetricsApiResponse<DotNetMetricDTO> GetDotNetMetrics(MetricsApiRequest request);
+        MetricsApiResponse<HddMetricDTO> GetHddMetrics(MetricsApiRequest request);
+        MetricsApiResponse<NetworkMetricDTO> GetNetworkMetrics(MetricsApiRequest request);
+        MetricsApiResponse<RamMetricDTO> GetRamMetrics(MetricsApiRequest request);
         
         
     }

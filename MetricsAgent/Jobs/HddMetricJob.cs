@@ -20,8 +20,7 @@ namespace MetricsAgent.Jobs
             // Получаем значение
             var cpuUsageInPercents = Convert.ToInt32(_hddCounter.NextValue());
             // Узнаем, когда мы сняли значение метрики
-            var time =
-            TimeSpan.FromSeconds(DateTimeOffset.UtcNow.ToUnixTimeSeconds());
+            var time = DateTimeOffset.Now.ToUnixTimeSeconds();
             // Теперь можно записать что-то посредством репозитория
             _repository.Create(new Models.HddMetric
             {

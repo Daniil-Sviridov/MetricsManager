@@ -12,54 +12,43 @@ namespace MetricsManager.Controllers
     {
         private readonly ILogger<CpuMetricsController> _logger;
         private readonly ICpuMetricsRepository _repository;
-        private readonly IAgentsRepository _agentsRepository;
-        private readonly IHttpClientFactory _clientFactory;
 
-        /*public CpuMetricsController()
-        {
-            _logger = null;
-        }*/
-
-        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository, IAgentsRepository agentsRepository, IHttpClientFactory clientFactory)
+        public CpuMetricsController(ILogger<CpuMetricsController> logger, ICpuMetricsRepository repository)
         {
             _logger = logger;
             _repository = repository;
-            _agentsRepository = agentsRepository;
-            _clientFactory = clientFactory;
 
             _logger.LogInformation("NLog встроен в CpuMetricsController");
         }
 
         [HttpGet("agent/{agentId}/from/{fromTime}/to/{toTime}")]
-        public async Task<IActionResult> GetMetricsFromAgentAsync([FromRoute] int agentId, [FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        public IActionResult GetMetricsFromAgent([FromRoute] int agentId, [FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
-            _logger.LogInformation("Привет! Это наше первое сообщение в лог");
-            /*int k = 0;
-            _ = 2 / k;*/
+            _logger.LogInformation($"api/metrics/cpu/agent/{agentId}/from/{fromTime}/to/{toTime}");
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://localhost:5001/api/metrics/cpu/from/2022.03.01/to/2022.04.05");
-            request.Headers.Add("Accept", "application/vnd.github.v3+json");
-            var client = _clientFactory.CreateClient();
-            HttpResponseMessage response = client.Send(request);
-            if (response.IsSuccessStatusCode)
+            var metrics = _repository.GetMetricsOutPeriodByAgentId(agentId, fromTime.ToUnixTimeSeconds(), toTime.ToUnixTimeSeconds());
+            var response = new MetricsApiResponse<CpuMetricDTO>();
+
+            foreach (var metric in metrics)
             {
-                var responseStream = response.Content.ReadAsStringAsync().Result.Trim('\\');
-                var metricsResponse = System.Text.Json.JsonSerializer.Deserialize<MetricsApiResponse<CpuMetricDTO>>(responseStream, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase }); 
-
-                return Ok(metricsResponse);
+                response.Metrics.Add(new CpuMetricDTO { AgentId = metric.AgentId, Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), Value = metric.Value });
             }
-            else
-            {
-                // ошибка при получении ответа
-            }
-
-            return Ok();
+            return Ok(response);
         }
 
         [HttpGet("cluster/from/{fromTime}/to/{toTime}")]
-        public IActionResult GetMetricsFromAllCluster([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
+        public IActionResult GetMetricsFromAllCluster([FromRoute] DateTimeOffset fromTime, [FromRoute] DateTimeOffset toTime)
         {
-            return Ok();
+            _logger.LogInformation($"api/metrics/cpu/cluster/from/{fromTime}/to/{toTime}");
+
+            var metrics = _repository.GetMetricsOutPeriod(fromTime.ToUnixTimeSeconds(), toTime.ToUnixTimeSeconds());
+            var response = new MetricsApiResponse<CpuMetricDTO>();
+
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(new CpuMetricDTO { AgentId = metric.AgentId, Time = DateTimeOffset.FromUnixTimeSeconds(metric.Time), Value = metric.Value });
+            }
+            return Ok(response);
         }
 
     }

@@ -5,69 +5,187 @@ using System;
 using System.Net.Http;
 using System.Text.Json;
 using MetricsManager.Models;
+using System.Globalization;
 
 namespace MetricsManager.Client
 {
     public class MetricsAgentClient : IMetricsAgentClient
     {
         private readonly HttpClient _httpClient;
-        //private readonly ILogger _logger;
-        public MetricsAgentClient(HttpClient httpClient) //, ILogger logger
+        private readonly ILogger _logger;
+        public MetricsAgentClient(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            // _logger = logger;
         }
 
-        public MetricsApiResponse<CpuMetric> GetCpuMetrics(MetricsApiRequest request)
+        public MetricsApiResponse<CpuMetricDTO> GetCpuMetrics(MetricsApiRequest request)
         {
-            var fromParameter = request.FromTime;
-            var toParameter = request.ToTime;
+            DateTimeFormatInfo myDTFI = new CultureInfo("en-US", false).DateTimeFormat;
 
-            var sr = $"{request.AgentUrl}/api/metrics/cpu/from/{fromParameter}/to/{toParameter}";
+            var fromParameter = request.FromTime.ToString(myDTFI.SortableDateTimePattern);
+            var toParameter = request.ToTime.ToString(myDTFI.SortableDateTimePattern);
+
+            //https://localhost:5001/api/metrics/cpu/from/2022-04-05T14:00:45+000/to/2022-04-05T17:42:01+000
+
+            var sr = $"{request.AgentUrl}/api/metrics/cpu/from/{fromParameter}+00:00/to/{toParameter}+00:00";
 
             var httpRequest = new HttpRequestMessage(HttpMethod.Get, sr);
             httpRequest.Headers.Add("Accept", "application/vnd.github.v3+json");
-
 
             try
             {
                 HttpResponseMessage response = _httpClient.Send(httpRequest);
                 if (response.IsSuccessStatusCode)
                 {
-                    var responseStream = response.Content.ReadAsStream();
-                     var responseJSON = JsonSerializer.Deserialize<MetricsApiResponse<CpuMetric>>(responseStream);
+                    var responseString = response.Content.ReadAsStringAsync().Result;
+                    var deserializeJSON = JsonSerializer.Deserialize<MetricsApiResponse<CpuMetricDTO>>(responseString, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-                    return responseJSON;
+                    return deserializeJSON is null ? new MetricsApiResponse<CpuMetricDTO>() : deserializeJSON;
                 }
-                int a = 1;
+
             }
             catch (Exception ex)
             {
-                //_logger.LogError(ex.Message);
-                return null;
+                //  _logger.LogError(ex.Message);
             }
 
-            return null;
+            return new MetricsApiResponse<CpuMetricDTO>();
         }
 
-        public MetricsApiResponse<DotNetMetric> GetDonNetMetrics(MetricsApiRequest request)
+        public MetricsApiResponse<DotNetMetricDTO> GetDotNetMetrics(MetricsApiRequest request)
         {
-            throw new NotImplementedException();
+            DateTimeFormatInfo myDTFI = new CultureInfo("en-US", false).DateTimeFormat;
+
+            var fromParameter = request.FromTime.ToString(myDTFI.SortableDateTimePattern);
+            var toParameter = request.ToTime.ToString(myDTFI.SortableDateTimePattern);
+
+            //https://localhost:5001/api/metrics/cpu/from/2022-04-05T14:00:45+000/to/2022-04-05T17:42:01+000
+
+            var sr = $"{request.AgentUrl}/api/metrics/dotnet/from/{fromParameter}+00:00/to/{toParameter}+00:00";
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, sr);
+            httpRequest.Headers.Add("Accept", "application/vnd.github.v3+json");
+
+            try
+            {
+                HttpResponseMessage response = _httpClient.Send(httpRequest);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = response.Content.ReadAsStringAsync().Result;
+                    var deserializeJSON = JsonSerializer.Deserialize<MetricsApiResponse<DotNetMetricDTO>>(responseString, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+                    return deserializeJSON is null ? new MetricsApiResponse<DotNetMetricDTO>() : deserializeJSON;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //  _logger.LogError(ex.Message);
+            }
+
+            return new MetricsApiResponse<DotNetMetricDTO>();
         }
 
-        public MetricsApiResponse<HddMetric> GetHddMetrics(MetricsApiRequest request)
+        public MetricsApiResponse<HddMetricDTO> GetHddMetrics(MetricsApiRequest request)
         {
-            throw new NotImplementedException();
+            DateTimeFormatInfo myDTFI = new CultureInfo("en-US", false).DateTimeFormat;
+
+            var fromParameter = request.FromTime.ToString(myDTFI.SortableDateTimePattern);
+            var toParameter = request.ToTime.ToString(myDTFI.SortableDateTimePattern);
+
+            //https://localhost:5001/api/metrics/cpu/from/2022-04-05T14:00:45+000/to/2022-04-05T17:42:01+000
+
+            var sr = $"{request.AgentUrl}/api/metrics/hdd/from/{fromParameter}+00:00/to/{toParameter}+00:00";
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, sr);
+            httpRequest.Headers.Add("Accept", "application/vnd.github.v3+json");
+
+            try
+            {
+                HttpResponseMessage response = _httpClient.Send(httpRequest);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = response.Content.ReadAsStringAsync().Result;
+                    var deserializeJSON = JsonSerializer.Deserialize<MetricsApiResponse<HddMetricDTO>>(responseString, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+                    return deserializeJSON is null ? new MetricsApiResponse<HddMetricDTO>() : deserializeJSON;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //  _logger.LogError(ex.Message);
+            }
+
+            return new MetricsApiResponse<HddMetricDTO>();
         }
 
-        public MetricsApiResponse<NetworkMetric> GetNetworkMetrics(MetricsApiRequest request)
+        public MetricsApiResponse<NetworkMetricDTO> GetNetworkMetrics(MetricsApiRequest request)
         {
-            throw new NotImplementedException();
+            DateTimeFormatInfo myDTFI = new CultureInfo("en-US", false).DateTimeFormat;
+
+            var fromParameter = request.FromTime.ToString(myDTFI.SortableDateTimePattern);
+            var toParameter = request.ToTime.ToString(myDTFI.SortableDateTimePattern);
+
+            //https://localhost:5001/api/metrics/cpu/from/2022-04-05T14:00:45+000/to/2022-04-05T17:42:01+000
+
+            var sr = $"{request.AgentUrl}/api/metrics/network/from/{fromParameter}+00:00/to/{toParameter}+00:00";
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, sr);
+            httpRequest.Headers.Add("Accept", "application/vnd.github.v3+json");
+
+            try
+            {
+                HttpResponseMessage response = _httpClient.Send(httpRequest);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = response.Content.ReadAsStringAsync().Result;
+                    var deserializeJSON = JsonSerializer.Deserialize<MetricsApiResponse<NetworkMetricDTO>>(responseString, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+                    return deserializeJSON is null ? new MetricsApiResponse<NetworkMetricDTO>() : deserializeJSON;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //  _logger.LogError(ex.Message);
+            }
+
+            return new MetricsApiResponse<NetworkMetricDTO>();
         }
 
-        public MetricsApiResponse<RamMetric> GetRamMetrics(MetricsApiRequest request)
+        public MetricsApiResponse<RamMetricDTO> GetRamMetrics(MetricsApiRequest request)
         {
-            throw new NotImplementedException();
+            DateTimeFormatInfo myDTFI = new CultureInfo("en-US", false).DateTimeFormat;
+
+            var fromParameter = request.FromTime.ToString(myDTFI.SortableDateTimePattern);
+            var toParameter = request.ToTime.ToString(myDTFI.SortableDateTimePattern);
+
+            //https://localhost:5001/api/metrics/cpu/from/2022-04-05T14:00:45+000/to/2022-04-05T17:42:01+000
+
+            var sr = $"{request.AgentUrl}/api/metrics/ram/from/{fromParameter}+00:00/to/{toParameter}+00:00";
+
+            var httpRequest = new HttpRequestMessage(HttpMethod.Get, sr);
+            httpRequest.Headers.Add("Accept", "application/vnd.github.v3+json");
+
+            try
+            {
+                HttpResponseMessage response = _httpClient.Send(httpRequest);
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseString = response.Content.ReadAsStringAsync().Result;
+                    var deserializeJSON = JsonSerializer.Deserialize<MetricsApiResponse<RamMetricDTO>>(responseString, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+                    return deserializeJSON is null ? new MetricsApiResponse<RamMetricDTO>() : deserializeJSON;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                //  _logger.LogError(ex.Message);
+            }
+
+            return new MetricsApiResponse<RamMetricDTO>();
         }
     }
 }

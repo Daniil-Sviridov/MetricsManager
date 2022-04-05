@@ -115,5 +115,10 @@ namespace MetricsAgent.DAL
                 new { fromTime = fromTime, toTime = toTime}).ToList();
             }
         }
+
+        public DateTimeOffset GetMaxDate(int agentid)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

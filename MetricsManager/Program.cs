@@ -35,17 +35,29 @@ try
 
     builder.Services.AddSingleton<IAgentsRepository, AgentsRepository>();
     builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
+    builder.Services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
+    builder.Services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
+    builder.Services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
+    builder.Services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
 
     builder.Services.AddSingleton<IJobFactory, SingletonJobFactory>();
     builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
 
     // Добавляем задачи
     builder.Services.AddSingleton<CpuMetricJob>();
-  
+    builder.Services.AddSingleton<DotNetMetricJob>();
+    builder.Services.AddSingleton<NetworkMetricJob>();
+    builder.Services.AddSingleton<HddMetricJob>();
+    builder.Services.AddSingleton<RamMetricJob>();
 
-    string stringExpression = "0/5 * * * * ?"; // Запускать каждые 5 секунд
+
+    string stringExpression = "0/50 * * * * ?"; // Запускать каждые 5 секунд
 
     builder.Services.AddSingleton(new JobSchedule(jobType: typeof(CpuMetricJob), cronExpression: stringExpression));
+    builder.Services.AddSingleton(new JobSchedule(jobType: typeof(DotNetMetricJob), cronExpression: stringExpression));
+    builder.Services.AddSingleton(new JobSchedule(jobType: typeof(NetworkMetricJob), cronExpression: stringExpression));
+    builder.Services.AddSingleton(new JobSchedule(jobType: typeof(HddMetricJob), cronExpression: stringExpression));
+    builder.Services.AddSingleton(new JobSchedule(jobType: typeof(RamMetricJob), cronExpression: stringExpression));
 
     builder.Services.AddHostedService<QuartzHostedService>();
 
@@ -53,7 +65,7 @@ try
 
     builder.Services.AddSingleton<IConnectionManager, ConnectionManager>();
 
-    builder.Services.AddHttpClient<IMetricsAgentClient,MetricsAgentClient>();
+    builder.Services.AddHttpClient<IMetricsAgentClient, MetricsAgentClient>();
     //.AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _=> TimeSpan.FromMilliseconds(1000)))
 
 
