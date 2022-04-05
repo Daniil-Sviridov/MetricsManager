@@ -43,11 +43,11 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
-        /// <summary>
-        /// Заглушка
-        /// </summary>
-        /// <param name="agentId"></param>
-        /// <returns></returns>
+        ///<summary>
+        ///Заглушка
+        ///</summary>
+        ///<param name="agentId"></param>
+        ///<returns></returns>
         [HttpPut("disable/{agentId}")]
         public IActionResult DisableAgentById([FromRoute] int agentId)
         {
