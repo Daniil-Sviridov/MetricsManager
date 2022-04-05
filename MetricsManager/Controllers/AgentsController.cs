@@ -18,6 +18,11 @@ namespace MetricsManager.Controllers
             _repository = repository;
         }
 
+        /// <summary>
+        /// Регистрация агента для опроса менеджером
+        /// </summary>
+        /// <param name="agentInfo"> Json поля AgentAddress (пример: https://localhost:7297 ) статус агента IsEnabled  - treu/false  </param>
+        /// <returns></returns>
         [HttpPost("register")]
         public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
         {
@@ -27,18 +32,32 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
+        /// <summary>
+        /// Заглушка
+        /// </summary>
+        /// <param name="agentId"></param>
+        /// <returns></returns>
         [HttpPut("enable/{agentId}")]
         public IActionResult EnableAgentById([FromRoute] int agentId)
         {
             return Ok();
         }
 
+        /// <summary>
+        /// Заглушка
+        /// </summary>
+        /// <param name="agentId"></param>
+        /// <returns></returns>
         [HttpPut("disable/{agentId}")]
         public IActionResult DisableAgentById([FromRoute] int agentId)
         {
             return Ok();
         }
 
+        /// <summary>
+        /// Возвращает список всех зарегистрированных агентов
+        /// </summary>
+        /// <returns></returns>
         [HttpGet("all")]
         public IActionResult GetAll()
         {

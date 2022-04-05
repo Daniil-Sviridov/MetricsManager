@@ -6,11 +6,13 @@ using MetricsManager.DAL;
 using MetricsManager.DAL.Migrations;
 using MetricsManager.DAL.Repositories;
 using MetricsManager.Jobs;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Spi;
+using System.Reflection;
 
 NLog.GlobalDiagnosticsContext.Set("LogDirectory", Path.Combine(Directory.GetCurrentDirectory(), "Logs"));
 
@@ -32,6 +34,33 @@ try
     builder.Host.UseNLog();
 
     logger.Debug("Приложение запущено.");
+
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen(c =>
+    {
+        c.SwaggerDoc("v1", new OpenApiInfo
+        {
+            Version = "v1",
+            Title = "API сервиса агента сбора метрик",
+            Description = "Здесь можно поиграть с api нашего сервиса",
+            TermsOfService = new Uri("https://example.com/terms"),
+            Contact = new OpenApiContact
+            {
+                Name = "Kadyrov",
+                Email = string.Empty,
+                Url = new Uri("https://kremlin.ru"),
+            },
+            License = new OpenApiLicense
+            {
+                Name = "Можно указать, под какой лицензией всё опубликовано",
+                Url = new Uri("https://example.com/license"),
+            }
+
+        }); 
+        var xmlFile =  $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
+    });
 
     builder.Services.AddSingleton<IAgentsRepository, AgentsRepository>();
     builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
@@ -68,10 +97,6 @@ try
     builder.Services.AddHttpClient<IMetricsAgentClient, MetricsAgentClient>();
     //.AddTransientHttpErrorPolicy(p => p.WaitAndRetryAsync(3, _=> TimeSpan.FromMilliseconds(1000)))
 
-
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
-
     var serviceProvider = new ServiceCollection()
         // Add common FluentMigrator services
         .AddFluentMigratorCore()
@@ -101,7 +126,7 @@ try
     var app = builder.Build();
 
     // Настройте конвейер HTTP-запросов.
-    if (!app.Environment.IsDevelopment())
+    if (app.Environment.IsDevelopment())
     {
         /* app.UseExceptionHandler("/Home/Error");
          // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
