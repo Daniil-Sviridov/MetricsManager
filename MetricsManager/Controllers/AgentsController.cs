@@ -54,10 +54,10 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
-        /// <summary>
-        /// Возвращает список всех зарегистрированных агентов
-        /// </summary>
-        /// <returns></returns>
+        ///<summary>
+        ///Возвращает список всех зарегистрированных агентов
+        ///</summary>
+        ///<returns></returns>
         [HttpGet("all")]
         public IActionResult GetAll()
         {
